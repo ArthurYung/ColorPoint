@@ -19,5 +19,8 @@
   "devDependencies": {
     "electron": "^4.0.7",
     "electron-debug": "^1.5.0"
+  },
+  "dependencies": {
+    "lowdb": "^1.0.0"
   }
 }

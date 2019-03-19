@@ -1,19 +1,18 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, ipcMain, desktopCapturer } = require('electron')
+const { changeShort } = require('../utils/db')
+
 require('electron-debug')({ showDevTools: false })
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 let pickWindow
 
-function storeMainPosition() {
-  global.MAIN_POSITION = mainWindow.getPosition()
-}
-
 function createWindow () {
-  global.myGlobalVariable = {}
   // Create the browser window.
+  global.myGlobalVariable = {}
   Menu.setApplicationMenu(null)
+
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -21,40 +20,61 @@ function createWindow () {
       nodeIntegration: true
     }
   })
+
+  pickWindow = new BrowserWindow({
+    width: 100, 
+    height: 100, 
+    fullscreen: true, 
+    resizable: false, 
+    skipTaskbar: true, 
+    hasShadow: false,
+    frame: false, 
+    alwaysOnTop: true,
+    transparent: true,
+    show: false
+  })
+  pickWindow.loadFile('pick.html')
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
+  //add shortcut
+  // globalShortcut.register('ctrl+shift+q', function () {
+  //   mainWindow.webContents.send('global-shortcut-capture', 1);
+  // });
+
   mainWindow.on('closed', function () {
-    mainWindow = null
+    app.quit()
   })
 
   ipcMain.on('mutation-global', function (event, arg) {
     global.myGlobalVariable[arg.name] = arg.value;
   })
 
-  ipcMain.on('hide-main', function(e, arg) {
-    mainWindow.hide()
+  ipcMain.on('hide-main', function(event, arg) {
     global.MAIN_POSITION = mainWindow.getPosition()
-    mainWindow.setPosition(arg.x, arg.y)
+    mainWindow.setPosition(arg.width, arg.height)
+    mainWindow.hide()
+    let timer = setInterval(() => {
+      if (!mainWindow.isVisible()) {
+        event.sender.send('async-hided')
+        clearInterval(timer)
+      }
+    }, 10)
   })
 
-  ipcMain.on('create-pick-window', function(e, arg) {
-    pickWindow = new BrowserWindow({
-      width: arg.w, 
-      height: arg.h, 
-      fullscreen: true, 
-      resizable: false, 
-      skipTaskbar: true, 
-      frame: false, 
-      alwaysOnTop: true
-    })
-    mainWindow.loadFile('pick.html')
+  ipcMain.on('show-pick-window', function(e, arg) {
+    pickWindow.setSize(arg.width, arg.height)
+    pickWindow.show()
+    e.sender.send('pick-img-init')
+  })
+
+  ipcMain.on('close-pick-window', function(e, arg) {
+    pickWindow.hide()
+    mainWindow.setPosition(200, 400)
+    mainWindow.show()
   })
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 
 // Quit when all windows are closed.
