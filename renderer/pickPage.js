@@ -9,14 +9,12 @@ class App {
     this.addEventBody()
   }
   _init() {
-    this.w = document.body.clientWidth
-    this.h = document.body.clientHeight
     this.data = getStore('CURRENT_IMG')
-    this.canvas.width = this.w
-    this.canvas.height = this.h
     let img = new Image()
     img.onload = () => {
-      this.ctx.drawImage(img, 0, 0, this.w, this.h)
+      this.canvas.width = img.width
+      this.canvas.height = img.height
+      this.ctx.drawImage(img, 0, 0, img.width, img.height)
     }
     img.src = this.data
   }
@@ -28,6 +26,7 @@ class App {
 }
 
 const app = new App()
+
 ipcRenderer.on('pick-img-init', ()=> {
   app._init()
 })

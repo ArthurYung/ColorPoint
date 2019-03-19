@@ -23,14 +23,17 @@ function createWindow () {
 
   pickWindow = new BrowserWindow({
     width: 100, 
-    height: 100, 
-    fullscreen: true, 
+    height: 100,
+    fullscreenable:true,
+    fullscreen: true,
+    simpleFullscreen:true,
     resizable: false, 
     skipTaskbar: true, 
-    hasShadow: false,
+    hasShadow: true,
     frame: false, 
     alwaysOnTop: true,
     transparent: true,
+    titleBarStyle: 'hidden',
     show: false
   })
   pickWindow.loadFile('pick.html')
@@ -51,8 +54,6 @@ function createWindow () {
   })
 
   ipcMain.on('hide-main', function(event, arg) {
-    global.MAIN_POSITION = mainWindow.getPosition()
-    mainWindow.setPosition(arg.width, arg.height)
     mainWindow.hide()
     let timer = setInterval(() => {
       if (!mainWindow.isVisible()) {
@@ -62,16 +63,16 @@ function createWindow () {
     }, 10)
   })
 
-  ipcMain.on('show-pick-window', function(e, arg) {
+  ipcMain.on('show-pick-window', function(event, arg) {
     pickWindow.setSize(arg.width, arg.height)
+    pickWindow.webContents.send('pick-img-init')
     pickWindow.show()
-    e.sender.send('pick-img-init')
   })
 
   ipcMain.on('close-pick-window', function(e, arg) {
     pickWindow.hide()
-    mainWindow.setPosition(200, 400)
     mainWindow.show()
+    mainWindow.focus()
   })
 }
 
