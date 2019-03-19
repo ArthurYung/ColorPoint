@@ -5,3 +5,4 @@ yarn.lock
 yarn-error.log
 /ignore/
 /pkg/
+package-lock.json
