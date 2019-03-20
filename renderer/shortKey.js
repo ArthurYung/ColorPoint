@@ -6,8 +6,7 @@ const numberKeys = [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
 const symbolKeys = [ '-', '=', '[', ']', '\\', ';', "'", ',', '.', '.', '/']
 
-const letterKeys = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-                     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+const letterKeys = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 const _MATCH_DIGIT_ = /^(Digit)(.*)/
 
@@ -93,10 +92,11 @@ class ShortKeys{
     return key.toLowerCase().replace(/^[a-z]/, $1=>$1.toUpperCase());
   }
 
-  Combination(event) {
+  Combination(event, easy) {
+    event.preventDefault()
+    event.returnValue=false
     const code = this.matchKey(event.code)
     const value = event.type === 'keydown'
-
     if (this.commands.includes(code)) {
       this.commandKeys[code] = value
     }
@@ -107,7 +107,7 @@ class ShortKeys{
   }
 
   keydownEvent() {
-    this.currentKeys = Object.keys(this.commandKeys).filter(key => {
+    this.currentKeys = this.commands.filter(key => {
       if (this.commandKeys[key]) return true
       else return false
     })
@@ -135,9 +135,10 @@ class ShortKeys{
   resetKeys(keys) {
     this.clearKeyboard()
     if (Array.isArray(keys)) {
-      keys.map(key => {
-        this.combination({type: 'keydown', code: key})
-      })
+      this.currentKeys = keys
+      this.keyboardValue = this.currentKeys.join('+')
+      console.log('is ok')
+      this.onkeypressCallback(this.keyboardValue, this)
     }
   }
 

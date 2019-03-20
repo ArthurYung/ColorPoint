@@ -13,11 +13,11 @@ const $input = document.getElementById('trues')
 
 
 let short = new ShortKeys($input)
-short.resetKeys(['alt', 'd'])
+
 short.onkeypress((a,b) => {
   $input.value = a
 })
-
+short.resetKeys(['Alt', 'D'])
 const beforeCapture = () => {
   ipcRenderer.send('hide-main', size)
 }
