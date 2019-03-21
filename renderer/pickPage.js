@@ -7,6 +7,7 @@ class App {
     this.canvas = document.getElementById('canvas')
     this.ctx = this.canvas.getContext('2d')
     this.addEventBody()
+    this._init()
   }
   _init() {
     this.data = getStore('CURRENT_IMG')
@@ -18,15 +19,13 @@ class App {
     }
     img.src = this.data
   }
+  send (action, arg) {
+    ipcRenderer.send(action, arg)
+  }
   addEventBody() {
-    document.body.addEventListener('click', function () {
-      ipcRenderer.send('close-pick-window')
+    document.body.addEventListener('click', () => {
+      this.send('close-pick-window')
     })
   }
 }
-
 const app = new App()
-
-ipcRenderer.on('pick-img-init', ()=> {
-  app._init()
-})

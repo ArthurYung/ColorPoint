@@ -1,12 +1,14 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, ipcMain, desktopCapturer } = require('electron')
-const { changeShort } = require('../utils/db')
-
+const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+const setShortcut = require('../utils/setKeys')
 require('electron-debug')({ showDevTools: false })
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+
+
 let mainWindow
 let pickWindow
+
+// set global shortcut function
+
 
 function createWindow () {
   // Create the browser window.
@@ -21,29 +23,13 @@ function createWindow () {
     }
   })
 
-  pickWindow = new BrowserWindow({
-    width: 100, 
-    height: 100,
-    fullscreenable:true,
-    fullscreen: true,
-    simpleFullscreen:true,
-    resizable: false, 
-    skipTaskbar: true, 
-    hasShadow: true,
-    frame: false, 
-    alwaysOnTop: true,
-    transparent: true,
-    titleBarStyle: 'hidden',
-    show: false
-  })
-  pickWindow.loadFile('pick.html')
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
-  //add shortcut
-  // globalShortcut.register('ctrl+shift+q', function () {
-  //   mainWindow.webContents.send('global-shortcut-capture', 1);
-  // });
+  // and bind default shortcut keys by db.
+  setShortcut(false, function() {
+    mainWindow.webContents.send('shortcut-show');
+  });
 
   mainWindow.on('closed', function () {
     app.quit()
@@ -54,26 +40,43 @@ function createWindow () {
   })
 
   ipcMain.on('hide-main', function(event, arg) {
+    mainWindow.setPosition(arg.width, arg.height)
     mainWindow.hide()
-    let timer = setInterval(() => {
-      if (!mainWindow.isVisible()) {
-        event.sender.send('async-hided')
-        clearInterval(timer)
-      }
+    setTimeout(() => {
+      event.sender.send('async-hided')
     }, 10)
   })
 
-  ipcMain.on('show-pick-window', function(event, arg) {
-    pickWindow.setSize(arg.width, arg.height)
-    pickWindow.webContents.send('pick-img-init')
-    pickWindow.show()
+  ipcMain.on('create-pick-window', function(event, arg) {
+    pickWindow = new BrowserWindow({
+      width: arg.width, 
+      height: arg.height,
+      fullscreenable:true,
+      fullscreen: true,
+      simpleFullscreen:true,
+      resizable: false, 
+      skipTaskbar: true, 
+      hasShadow: true,
+      frame: false, 
+      alwaysOnTop: true,
+      transparent: true,
+      titleBarStyle: 'hidden'
+    })
+    pickWindow.loadFile('pick.html')
   })
 
   ipcMain.on('close-pick-window', function(e, arg) {
     pickWindow.hide()
+    mainWindow.center()
     mainWindow.show()
-    mainWindow.focus()
   })
+
+  ipcMain.on('reset-short-key', function(event, arg) {
+    setShortcut(arg, function() {
+      mainWindow.webContents.send('shortcut-show');
+    });
+  })
+
 }
 
 app.on('ready', createWindow)

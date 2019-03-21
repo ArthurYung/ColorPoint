@@ -3,21 +3,12 @@
 // All of the Node.js APIs are available in this process.
 const { mutation} = require('./store')
 const { ipcRenderer, desktopCapturer, clipboard } = require( "electron" );
-const ShortKeys = require('./shortKey')
+const resetKey = require('./home/resetKey')
 
 const size = {width: screen.width, height: screen.height}
 
-const $click = document.getElementById('click')
-const $ok = document.getElementById('ok')
-const $input = document.getElementById('trues')
+const ResetKey = new resetKey()
 
-
-let short = new ShortKeys($input)
-
-short.onkeypress((a,b) => {
-  $input.value = a
-})
-short.resetKeys(['Alt', 'D'])
 const beforeCapture = () => {
   ipcRenderer.send('hide-main', size)
 }
@@ -27,14 +18,11 @@ const startCapture = ()=> {
     if (error) throw error;
     mutation({name: 'CURRENT_IMG', value: sources[0].thumbnail.toDataURL()})
     clipboard.writeImage(sources[0].thumbnail)
-    ipcRenderer.send('show-pick-window', size)
+    ipcRenderer.send('create-pick-window', size)
   })
 }
 
-$click.addEventListener('click', beforeCapture)
-$ok.addEventListener('click', function() {
-  changeShort('start',$input.value)
-})
+document.getElementById('start').addEventListener('click', beforeCapture)
 
 ipcRenderer.on('async-hided', startCapture)
 
