@@ -1,13 +1,25 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, Tray } = require('electron')
+const { resolve } = require('path')
+const { createMenu, menuBuild } = require('./menur')
 const setShortcut = require('../utils/setKeys')
+
 require('electron-debug')({ showDevTools: false })
+
+const ASSETS_PATH = resolve(__dirname, '../assets')
+const APP_ICON = resolve(ASSETS_PATH, 'icon_app.png')
+const WHILTE_ICON = resolve(ASSETS_PATH, 'icon_tray.png')
 
 
 let mainWindow
 let pickWindow
+let trayApp
 
-// set global shortcut function
+function createtTray(icon) {
+  trayApp = new Tray(icon)
+  trayApp.setContextMenu(menuBuild)
+}
+
 function ipcMessager(main) {
   ipcMain.on('mutation-global', function (event, arg) {
     global.myGlobalVariable[arg.name] = arg.value;
@@ -57,12 +69,13 @@ function ipcMessager(main) {
 async function createWindow () {
   // Create the browser window.
   global.myGlobalVariable = {}
-  Menu.setApplicationMenu(null)
 
   mainWindow = new BrowserWindow({
     width: 400,
     height: 540,
     resizable: false,
+    title: 'Color Point',
+    icon: APP_ICON,
     webPreferences: {
       nodeIntegration: true
     },
@@ -71,7 +84,8 @@ async function createWindow () {
   })
 
   ipcMessager(mainWindow)
-
+  createMenu()
+  createtTray(WHILTE_ICON)
   setShortcut(false, function() {
     mainWindow.webContents.send('shortcut-show');
   });
@@ -108,7 +122,6 @@ app.on('activate', function () {
     createWindow()
   }
 })
-
-
+app.setName('Color Point')
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

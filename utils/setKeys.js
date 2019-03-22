@@ -7,6 +7,5 @@ module.exports = function (shortcut, event) {
   _shortcut = shortcut.toLowerCase()
   globalShortcut.unregisterAll()
   globalShortcut.register(_shortcut, event);
-  console.log(_shortcut)
   changeShort('keys', shortcut)
 }
