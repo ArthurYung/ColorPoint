@@ -8,40 +8,14 @@ let mainWindow
 let pickWindow
 
 // set global shortcut function
-
-
-function createWindow () {
-  // Create the browser window.
-  global.myGlobalVariable = {}
-  Menu.setApplicationMenu(null)
-
-  mainWindow = new BrowserWindow({
-    width: 400,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  })
-
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-
-  // and bind default shortcut keys by db.
-  setShortcut(false, function() {
-    mainWindow.webContents.send('shortcut-show');
-  });
-
-  mainWindow.on('closed', function () {
-    app.quit()
-  })
-
+function ipcMessager(main) {
   ipcMain.on('mutation-global', function (event, arg) {
     global.myGlobalVariable[arg.name] = arg.value;
   })
 
   ipcMain.on('hide-main', function(event, arg) {
-    mainWindow.setPosition(arg.width, arg.height)
-    mainWindow.hide()
+    main.setPosition(arg.width, arg.height)
+    main.hide()
     setTimeout(() => {
       event.sender.send('async-hided')
     }, 10)
@@ -67,8 +41,8 @@ function createWindow () {
 
   ipcMain.on('close-pick-window', function(e, arg) {
     pickWindow.hide()
-    mainWindow.center()
-    mainWindow.show()
+    main.center()
+    main.show()
   })
 
   ipcMain.on('reset-short-key', function(event, arg) {
@@ -77,6 +51,43 @@ function createWindow () {
     });
   })
 
+}
+
+
+async function createWindow () {
+  // Create the browser window.
+  global.myGlobalVariable = {}
+  Menu.setApplicationMenu(null)
+
+  mainWindow = new BrowserWindow({
+    width: 400,
+    height: 540,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true
+    },
+    darkTheme: true,
+    show: false
+  })
+
+  ipcMessager(mainWindow)
+
+  setShortcut(false, function() {
+    mainWindow.webContents.send('shortcut-show');
+  });
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  })
+
+  // and load the index.html of the app.
+  mainWindow.loadFile('index.html')
+
+  // and bind default shortcut keys by db.
+
+  mainWindow.on('closed', function () {
+    app.quit()
+  })
 }
 
 app.on('ready', createWindow)
