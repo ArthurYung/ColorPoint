@@ -1,11 +1,19 @@
-const { ipcRenderer, remote } = require( "electron" );
+const { remote, ipcRenderer } = require( "electron" );
 
-const mutation = ({name, value})=>{
-  ipcRenderer.send('mutation-global', {name, value})
+const mutation = (action)=>{
+  ipcRenderer.send('connct-store-context', action)
 }
 
-const getStore = name => {
-  return remote.getGlobal( "myGlobalVariable" )[name]
+const getter = (key) => {
+  return remote.getGlobal( "Store" )[key]
 }
 
-module.exports = {mutation, getStore}
+const connect = (App, reducer, opt = {}) => {
+  ipcRenderer.on('connct-store-provide', (event, action) => {
+    App.dispatch(action)
+  })
+  App.prototype.dispatch = reducer
+  return new App(opt, reducer)
+}
+
+module.exports = {mutation, getter, connect}

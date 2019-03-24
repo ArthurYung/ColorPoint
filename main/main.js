@@ -1,8 +1,9 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, Tray } = require('electron')
+const { app, BrowserWindow, ipcMain, Tray, globalShortcut } = require('electron')
 const { resolve } = require('path')
 const { createMenu, menuBuild } = require('./menur')
-const setShortcut = require('../utils/setKeys')
+const { changeShort, pushColor } = require('./db')
+const { actions, PREVIEW_IMAGE, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
 
 require('electron-debug')({ showDevTools: false })
 
@@ -15,15 +16,68 @@ let mainWindow
 let pickWindow
 let trayApp
 
+function createStore (actions) {
+  global.Store = {}
+  actions.forEach(action => {
+    global.Store[action.type] = action.default
+  })
+}
+
+function connect (appliction) {
+  ipcMain.on('connct-store-context', (event, action) => {
+    appliction(action)
+    global.Store[action.type] = action.payload
+    mainWindow && mainWindow.webContents.send('connct-store-provider', action)
+    pickWindow && pickWindow.webContents.send('connct-store-provider', action)
+  })
+}
+
+const appliction = (action, event) => {
+  switch (action.type) {
+    case PREVIEW_IMAGE:
+      pickWindow = new BrowserWindow({
+        width: action.arg.width, 
+        height: action.arg.height,
+        fullscreenable:true,
+        fullscreen: true,
+        simpleFullscreen:true,
+        resizable: false, 
+        skipTaskbar: true, 
+        hasShadow: true,
+        frame: false, 
+        alwaysOnTop: true,
+        transparent: true,
+        titleBarStyle: 'hidden'
+      })
+      pickWindow.loadFile('pick.html')
+      break;
+
+    case DEFAULTE_KEYS:
+      let shortcut = action.payload.toLowerCase()
+      globalShortcut.unregisterAll()
+      globalShortcut.register(shortcut, startByShort);
+      changeShort('keys', action.payload)
+      break
+
+    case HISTORY_COLOR:
+      pushColor(action.payload)
+      break
+
+    default:
+      break
+  }
+}
+
 function createtTray(icon) {
   trayApp = new Tray(icon)
   trayApp.setContextMenu(menuBuild)
 }
 
+function startByShort() {
+  mainWindow.webContents.send('shortcut-show');
+}
+
 function ipcMessager(main) {
-  ipcMain.on('mutation-global', function (event, arg) {
-    global.myGlobalVariable[arg.name] = arg.value;
-  })
 
   ipcMain.on('hide-main', function(event, arg) {
     main.setPosition(arg.width, arg.height)
@@ -31,24 +85,6 @@ function ipcMessager(main) {
     setTimeout(() => {
       event.sender.send('async-hided')
     }, 10)
-  })
-
-  ipcMain.on('create-pick-window', function(event, arg) {
-    pickWindow = new BrowserWindow({
-      width: arg.width, 
-      height: arg.height,
-      fullscreenable:true,
-      fullscreen: true,
-      simpleFullscreen:true,
-      resizable: false, 
-      skipTaskbar: true, 
-      hasShadow: true,
-      frame: false, 
-      alwaysOnTop: true,
-      transparent: true,
-      titleBarStyle: 'hidden'
-    })
-    pickWindow.loadFile('pick.html')
   })
 
   ipcMain.on('close-pick-window', function(e, arg) {
@@ -68,13 +104,13 @@ function ipcMessager(main) {
 
 async function createWindow () {
   // Create the browser window.
-  global.myGlobalVariable = {}
-
+  
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 540,
+    height: 410,
     resizable: false,
     title: 'Color Point',
+    backgroundColor: '#111327',
     icon: APP_ICON,
     webPreferences: {
       nodeIntegration: true
@@ -86,9 +122,9 @@ async function createWindow () {
   ipcMessager(mainWindow)
   createMenu()
   createtTray(WHILTE_ICON)
-  setShortcut(false, function() {
-    mainWindow.webContents.send('shortcut-show');
-  });
+  createStore(actions)
+  connect(appliction)
+  globalShortcut.register(global.Store.DEFAULTE_KEYS, startByShort)
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()

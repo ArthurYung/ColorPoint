@@ -1,5 +1,5 @@
 const ShortKeys = require('./shortKey')
-const { getShort } = require('../../utils/db')
+const { getter, mutation } = require('../store/index.js')
 const { ipcRenderer } = require('electron')
 
 class ResetKey {
@@ -27,7 +27,7 @@ class ResetKey {
   }
 
   getAppShort () {
-    this.cacheKey = getShort('keys')
+    this.cacheKey = getter('DEFAULTE_KEYS')
     this.render()
   }
 
@@ -43,7 +43,10 @@ class ResetKey {
   }
 
   submitKey () {
-    ipcRenderer.send('reset-short-key', this.cacheKey)
+    mutation({
+      type: 'DEFAULTE_KEYS',
+      payload: this.cacheKey
+    })
   }
 
   render () {

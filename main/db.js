@@ -6,6 +6,7 @@ const db = low(adapter)
 db.defaults({ shortcut: {}, colors: [] }).write()
 
 exports.changeShort = (name, key) => {
+  console.log(key)
   db.set('shortcut.' + String(name), key).write()
 }
 
@@ -23,4 +24,8 @@ exports.pushColor = color => {
     ID: Date.now().toString(),
     value: color
   }).write()
+}
+
+exports.getColor = () => {
+  return db.get('colors').value()
 }

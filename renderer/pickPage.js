@@ -1,5 +1,5 @@
 const { ipcRenderer, desktopCapturer } = require( "electron" );
-const { getStore } = require('./store')
+const { getter } = require('./store/index')
 
 
 class App {
@@ -10,7 +10,7 @@ class App {
     this._init()
   }
   _init() {
-    this.data = getStore('CURRENT_IMG')
+    this.data = getter('PREVIEW_IMAGE')
     let img = new Image()
     img.onload = () => {
       this.canvas.width = img.width
