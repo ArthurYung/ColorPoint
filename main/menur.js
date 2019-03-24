@@ -14,7 +14,13 @@ const trayTemplate = [
 ]
 
 
-exports.menuBuild = Menu.buildFromTemplate(trayTemplate)
+exports.menuBuild = unshiftFn => {
+  trayTemplate.unshift({
+    label: 'Start',
+    click: unshiftFn
+  })
+  return  Menu.buildFromTemplate(trayTemplate)
+} 
 
 exports.createMenu = () => {
   const template = [

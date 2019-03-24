@@ -38,9 +38,12 @@ const appliction = (action, event) => {
       pickWindow = new BrowserWindow({
         width: action.arg.width, 
         height: action.arg.height,
+        left: 0,
+        top: 0,
         fullscreenable:true,
         fullscreen: true,
         simpleFullscreen:true,
+        fullscreenWindowTitle: true,
         resizable: false, 
         skipTaskbar: true, 
         hasShadow: true,
@@ -50,6 +53,10 @@ const appliction = (action, event) => {
         titleBarStyle: 'hidden'
       })
       pickWindow.loadFile('pick.html')
+      pickWindow.on('blur', () => { 
+        pickWindow.destroy()
+      })
+       
       break;
 
     case DEFAULTE_KEYS:
@@ -69,8 +76,9 @@ const appliction = (action, event) => {
 }
 
 function createtTray(icon) {
+  let trayMenu = menuBuild(startByShort)
   trayApp = new Tray(icon)
-  trayApp.setContextMenu(menuBuild)
+  trayApp.setContextMenu(trayMenu)
 }
 
 function startByShort() {
@@ -91,14 +99,8 @@ function ipcMessager(main) {
     pickWindow.hide()
     main.center()
     main.show()
+    pickWindow.setSimpleFullScreen(false) 
   })
-
-  ipcMain.on('reset-short-key', function(event, arg) {
-    setShortcut(arg, function() {
-      mainWindow.webContents.send('shortcut-show');
-    });
-  })
-
 }
 
 
@@ -115,7 +117,11 @@ async function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
+    fullscreenable:false,
+    fullscreen: false,
+    simpleFullscreen:false,
     darkTheme: true,
+    fullscreenWindowTitle: true,
     show: false
   })
 
