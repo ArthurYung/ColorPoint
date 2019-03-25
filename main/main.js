@@ -4,33 +4,21 @@ const { resolve } = require('path')
 const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor } = require('./db')
 const { actions, PREVIEW_IMAGE, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
+const { platform } = require('process')
 
 require('electron-debug')({ showDevTools: false })
 
 const ASSETS_PATH = resolve(__dirname, '../assets')
-const APP_ICON = resolve(ASSETS_PATH, 'icon_app.png')
-const WHILTE_ICON = resolve(ASSETS_PATH, 'icon_tray.png')
+const APP_ICON = resolve(ASSETS_PATH,  'image/icon_app.png')
+const WHILTE_ICON = resolve(ASSETS_PATH, 'image/icon_tray.png')
+const MAIN_HTML = resolve(ASSETS_PATH, 'index.html')
+const PICK_HTML = resolve(ASSETS_PATH, 'pick.html')
 
+const isMac = platform === 'darwin'
 
 let mainWindow
 let pickWindow
 let trayApp
-
-function createStore (actions) {
-  global.Store = {}
-  actions.forEach(action => {
-    global.Store[action.type] = action.default
-  })
-}
-
-function connect (appliction) {
-  ipcMain.on('connct-store-context', (event, action) => {
-    appliction(action)
-    global.Store[action.type] = action.payload
-    mainWindow && mainWindow.webContents.send('connct-store-provider', action)
-    pickWindow && pickWindow.webContents.send('connct-store-provider', action)
-  })
-}
 
 const appliction = (action, event) => {
   switch (action.type) {
@@ -52,18 +40,13 @@ const appliction = (action, event) => {
         transparent: true,
         titleBarStyle: 'hidden'
       })
-      pickWindow.loadFile('pick.html')
-      pickWindow.on('blur', () => { 
-        pickWindow.destroy()
-      })
-       
+      pickWindow.loadFile(PICK_HTML)     
       break;
 
     case DEFAULTE_KEYS:
-      let shortcut = action.payload.toLowerCase()
-      globalShortcut.unregisterAll()
-      globalShortcut.register(shortcut, startByShort);
       changeShort('keys', action.payload)
+      let keys = action.payload.toLowerCase()
+      setShortCut(keys)
       break
 
     case HISTORY_COLOR:
@@ -73,6 +56,31 @@ const appliction = (action, event) => {
     default:
       break
   }
+}
+
+function setShortCut(shortcut) {
+  shortcut = shortcut.toLowerCase()
+  if (!shortcut || shortcut.indexOf('+') < 0) {
+    return
+  }
+  globalShortcut.unregisterAll()
+  globalShortcut.register(shortcut, startByShort);
+}
+
+function createStore (actions) {
+  global.Store = {}
+  actions.forEach(action => {
+    global.Store[action.type] = action.default
+  })
+}
+
+function connect (appliction) {
+  ipcMain.on('connct-store-context', (event, action) => {
+    appliction(action)
+    global.Store[action.type] = action.payload
+    mainWindow && mainWindow.webContents.send('connct-store-provider', action)
+    pickWindow && pickWindow.webContents.send('connct-store-provider', action)
+  })
 }
 
 function createtTray(icon) {
@@ -109,17 +117,11 @@ async function createWindow () {
   
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 410,
+    height: isMac ? 390 : 410,
     resizable: false,
     title: 'Color Point',
     backgroundColor: '#111327',
     icon: APP_ICON,
-    webPreferences: {
-      nodeIntegration: true
-    },
-    fullscreenable:false,
-    fullscreen: false,
-    simpleFullscreen:false,
     darkTheme: true,
     fullscreenWindowTitle: true,
     show: false
@@ -130,14 +132,14 @@ async function createWindow () {
   createtTray(WHILTE_ICON)
   createStore(actions)
   connect(appliction)
-  globalShortcut.register(global.Store.DEFAULTE_KEYS, startByShort)
+  setShortCut(global.Store.DEFAULTE_KEYS)
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile(MAIN_HTML)
 
   // and bind default shortcut keys by db.
 

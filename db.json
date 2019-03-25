@@ -1,6 +1,6 @@
 {
   "shortcut": {
-    "keys": "Ctrl+Shift+D",
+    "keys": "Command+B",
     "quit": "esc"
   },
   "colors": []

@@ -1,19 +1,13 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// All of the Node.js APIs are available in this process.
-const { mutation } = require('./store/index.js')
+const { mutation, connect } = require('./store/index.js')
 const { ipcRenderer, desktopCapturer } = require( "electron" );
-const resetKey = require('./home/resetKey')
-
+const Keyboard = require('./home/keyboard')
+const ColorHistory = require('./home/colorHistory')
 const size = {width: screen.width, height: screen.height}
 
-const ResetKey = new resetKey()
 
 const beforeCapture = () => {
   ipcRenderer.send('hide-main', size)
 }
-
-sessionStorage.setItem('test', 'istest')
 
 const startCapture = ()=> {
   desktopCapturer.getSources({types: ['screen'], thumbnailSize: size}, function(error, sources) {
@@ -26,8 +20,19 @@ const startCapture = ()=> {
   })
 }
 
-document.getElementById('start').addEventListener('click', beforeCapture)
-
 ipcRenderer.on('async-hided', startCapture)
 
 ipcRenderer.on('shortcut-show', beforeCapture)
+
+connect([{
+  subs: ['DEFAULTE_KEYS'],
+  object: new Keyboard({
+    el: document.querySelector('.mixin-keyboard'),
+    start: beforeCapture
+  })
+}, {
+  subs: ['Color'],
+  object: new ColorHistory({
+    el: document.querySelector('.mixin-colors')
+  })
+}])

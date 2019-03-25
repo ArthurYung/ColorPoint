@@ -1,0 +1,197 @@
+.main-logo {
+  display: block;
+  margin: 30px auto 0 auto
+}
+
+.main-title {
+  width: 100%;
+  text-align: center;
+  line-height: 34px
+}
+
+.main-text {
+  font-size: 16px;
+  color: #696a77
+}
+
+.article-app {
+  width: 100%;
+  position: relative;
+}
+
+.mixin-keyboard {
+  height: 44px;
+  margin-top: 14px;
+}
+
+.start-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-btn {
+  position: relative;
+  width: 236px;
+  height: 44px;
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 22px;
+  background-color: #9343e9;
+  border:none;
+  cursor: pointer;
+  transition: background-color .3s ease-out
+}
+
+.button-text,.button-juder {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  transition: transform .3s ease-out;
+}
+
+.button-text {
+  top: 0px;
+  line-height: 44px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bolder;
+}
+
+.button-juder {
+  top: 44px;
+  color: rgba(255,255,255,.5);
+  font-size: 14px
+}
+
+.button {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  background-color: rgba(0,0,0,0)
+}
+
+.reset-key {
+  display: block;
+  visibility: hidden;
+  position: absolute;
+  right: 50px;
+  top: 12px;
+  transition: opacity .3s ease-out;
+  opacity: 0;
+}
+
+.icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  cursor: pointer;
+}
+
+.icon-reset {
+  background-image: url('../../assets/image/change.png')
+}
+
+.start-btn:hover {
+  background-color: #a158f0
+}
+
+.app-hover .button-text {
+  transform: translate(0, -8px)
+}
+
+.app-hover .button-juder {
+  transform: translate(0, -20px)
+}
+
+.app-hover .reset-key, .app-hover .delete-all {
+  visibility: visible;
+  opacity: 1;
+}
+
+.reset-input {
+  position: relative;
+  display: flex; 
+  width: 230px;
+  height: 36px;
+  background-color: rgba(255,255,255,.8);
+  overflow: hidden;
+  border-radius: 18px;
+  margin: 4px auto 0 auto;
+  justify-content: center;
+  transition: background-color .3s ease-out
+}
+
+.reset-input-focus {
+  background-color: rgba(255,255,255,1)
+}
+
+.keyboard-view {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border:none;
+  background-color: rgba(0,0,0,0);
+  font-size: 16px;
+  font-weight: bolder;
+  color: #9343e9;
+  text-align: center;
+}
+
+.delete-all {
+  visibility: hidden;
+  position: absolute;
+  top: 8px;
+  right: 120px;
+  transition: opacity .3s ease-out;
+  opacity: 0;
+}
+
+.history-view {
+  width: 100%;
+  height: 88px;
+  margin-top: 36px;
+  background-color: #292d44
+}
+
+.icon-delete {
+  background-image: url('../../assets/image/delete.png');
+  height: 18px;
+}
+
+.color-view {
+  width: 100%;
+  margin-top: 6px; 
+  text-align: center
+}
+
+.color-view .color-list {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin: 0 6px;
+  box-shadow: 8px 8px 16px rgba(0,0,0,.4);
+  transition: transform .15s ease-out;
+  transform: scale(1);
+  cursor: pointer;
+}
+
+.color-list:hover {
+  transform: scale(1.2)
+}
+
+.footer {
+  line-height: 20px
+}
+
+.footer .main-text {
+  color: #2b2b4c;
+  font-size: 12px;
+}

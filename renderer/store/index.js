@@ -8,12 +8,14 @@ const getter = (key) => {
   return remote.getGlobal( "Store" )[key]
 }
 
-const connect = (App, reducer, opt = {}) => {
-  ipcRenderer.on('connct-store-provide', (event, action) => {
-    App.dispatch(action)
+const connect = (apps = []) => {
+  ipcRenderer.on('connct-store-provider', (event, action) => {
+    apps.forEach(app => {
+      if (app.subs.includes(action.type)) {
+        app.object.dispatch(action)
+      }
+    })
   })
-  App.prototype.dispatch = reducer
-  return new App(opt, reducer)
 }
 
 module.exports = {mutation, getter, connect}
