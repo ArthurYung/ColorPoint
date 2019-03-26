@@ -4,7 +4,6 @@ const { resolve } = require('path')
 const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor } = require('./db')
 const { actions, PREVIEW_IMAGE, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
-const { platform } = require('process')
 
 require('electron-debug')({ showDevTools: false })
 
@@ -14,7 +13,7 @@ const WHILTE_ICON = resolve(ASSETS_PATH, 'image/icon_tray.png')
 const MAIN_HTML = resolve(ASSETS_PATH, 'index.html')
 const PICK_HTML = resolve(ASSETS_PATH, 'pick.html')
 
-const isMac = platform === 'darwin'
+const isMac = process.platform === 'darwin'
 
 let mainWindow
 let pickWindow
@@ -22,28 +21,6 @@ let trayApp
 
 const appliction = (action, event) => {
   switch (action.type) {
-    case PREVIEW_IMAGE:
-      console.log(Date.now())
-      pickWindow = new BrowserWindow({
-        width: action.arg.width, 
-        height: action.arg.height,
-        left: 0,
-        top: 0,
-        fullscreenable:true,
-        fullscreen: true,
-        simpleFullscreen:true,
-        fullscreenWindowTitle: true,
-        resizable: false, 
-        skipTaskbar: true, 
-        hasShadow: true,
-        frame: false, 
-        alwaysOnTop: true,
-        transparent: true,
-        titleBarStyle: 'hidden'
-      })
-      pickWindow.loadFile(PICK_HTML)     
-      break;
-
     case DEFAULTE_KEYS:
       changeShort('keys', action.payload)
       let keys = action.payload.toLowerCase()
@@ -96,20 +73,19 @@ function startByShort() {
 
 function ipcMessager(main) {
 
-  ipcMain.on('hide-main', function(event, arg) {
-    console.log('hideMain' + Date.now())
+  ipcMain.on('start-point', function(event, arg) {
     main.setPosition(arg.width, arg.height)
     main.hide()
-    setTimeout(() => {
-      event.sender.send('async-hided')
-    }, 10)
+    pickWindow.setSize(arg.width,  arg.height)
+    pickWindow.show()
+    pickWindow.webContents.send('start-point-pr')
   })
+
 
   ipcMain.on('close-pick-window', function(e, arg) {
     pickWindow.hide()
     main.center()
     main.show()
-    pickWindow.setSimpleFullScreen(false) 
   })
 }
 
@@ -126,9 +102,24 @@ async function createWindow () {
     icon: APP_ICON,
     darkTheme: true,
     fullscreenWindowTitle: true,
+    show: true
+  })
+  pickWindow = new BrowserWindow({
+    width: 10, 
+    height: 10,
+    left: 0,
+    top: 0,
+    fullscreen: !isMac || undefined,
+    resizable: false,
+    movable: false,
+    skipTaskbar: true, 
+    hasShadow: true,
+    frame: false, 
+    alwaysOnTop: true,
+    transparent: true,
     show: false
   })
-
+  pickWindow.loadFile(PICK_HTML)
   ipcMessager(mainWindow)
   createMenu()
   createtTray(WHILTE_ICON)

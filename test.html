@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <video id="test"></video>
+  <canvas id="canvas"></canvas>
+  <script>
+
+    const { remote, screen } = require('electron')
+
+
+    let currentWindow = remote.getCurrentWindow()
+    console.log(currentWindow)
+    const getCurrentScreen = () => {
+        let { x, y } = currentWindow.getBounds()
+        console.log(x, y)
+        return screen.getPrimaryDisplay()
+    }
+    console.log(getCurrentScreen())
+   function getScreen(callback) {
+    this.callback = callback
+
+    document.body.style.opacity = '0'
+    let oldCursor = document.body.style.cursor
+    document.body.style.cursor = 'none'
+
+    this.handleStream = (stream) => {
+        document.body.style.cursor = oldCursor
+        document.body.style.opacity = '1'
+        // Create hidden video tag
+        let video = document.createElement('video')
+        video.style.cssText = 'position:absolute;top:-10000px;left:-10000px;'
+        // Event connected to stream
+        console.log('go')
+        let loaded = false
+        video.onloadedmetadata = () => {
+            console.log('start')
+            if (loaded) {
+                return
+            }
+            loaded = true
+            // Set video ORIGINAL height (screenshot)
+            video.style.height = video.videoHeight + 'px' // videoHeight
+            video.style.width = video.videoWidth + 'px' // videoWidth
+
+            // Create canvas
+            let canvas = document.createElement('canvas')
+            canvas.width = video.videoWidth
+            canvas.height = video.videoHeight
+            let ctx = canvas.getContext('2d')
+            // Draw video on canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+            document.body.appendChild(canvas)
+          
+
+            // Remove hidden video tag
+            video.remove()
+            // try {
+            //     stream.getTracks()[0].stop()
+            // } catch (e) {
+            //     // nothing
+            // }
+        }
+        video.srcObject = stream
+       
+    }
+
+    this.handleError = (e) => {
+        // console.log(e)
+    }
+      navigator.getUserMedia({
+          audio: false,
+          video: {
+              mandatory: {
+                  chromeMediaSource: 'desktop',
+                  // chromeMediaSourceId: `screen:${getCurrentScreen().id}`,
+                  maxWidth: 800,
+                  maxHeight: 400
+              },
+          },
+      }, (e) => {
+          this.handleStream(e)
+      }, this.handleError)
+  }
+getScreen()
+  </script>
+</body>
+</html>

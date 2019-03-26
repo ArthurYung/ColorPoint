@@ -1,35 +1,21 @@
-const { mutation, connect } = require('./store/index.js')
-const { ipcRenderer, desktopCapturer } = require( "electron" );
+const { connect } = require('./store/index.js')
+const { ipcRenderer } = require( "electron" );
 const Keyboard = require('./home/keyboard')
 const ColorHistory = require('./home/colorHistory')
-const size = {width: screen.width, height: screen.height}
+const size = {width: screen.availWidth, height: screen.availHeight}
 
-
-const beforeCapture = () => {
-  console.log('before' + Date.now())
-  ipcRenderer.send('hide-main', size)
-}
 
 const startCapture = ()=> {
-  console.log('startCap' + Date.now())
-  desktopCapturer.getSources({types: ['screen'], thumbnailSize: size}, function(error, sources) {
-    mutation({
-      type: 'PREVIEW_IMAGE',
-      payload: sources[0].thumbnail.toDataURL(),
-      arg: size
-    })
-  })
+  ipcRenderer.send('start-point', size)
 }
 
-ipcRenderer.on('async-hided', startCapture)
-
-ipcRenderer.on('shortcut-show', beforeCapture)
+ipcRenderer.on('shortcut-show', startCapture)
 
 connect([{
   subs: ['DEFAULTE_KEYS'],
   object: new Keyboard({
     el: document.querySelector('.mixin-keyboard'),
-    start: beforeCapture
+    start: startCapture
   })
 }, {
   subs: ['HISTORY_COLOR'],
