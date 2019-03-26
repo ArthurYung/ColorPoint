@@ -6,12 +6,13 @@ const size = {width: screen.width, height: screen.height}
 
 
 const beforeCapture = () => {
+  console.log('before' + Date.now())
   ipcRenderer.send('hide-main', size)
 }
 
 const startCapture = ()=> {
+  console.log('startCap' + Date.now())
   desktopCapturer.getSources({types: ['screen'], thumbnailSize: size}, function(error, sources) {
-    if (error) throw error;
     mutation({
       type: 'PREVIEW_IMAGE',
       payload: sources[0].thumbnail.toDataURL(),
@@ -31,7 +32,7 @@ connect([{
     start: beforeCapture
   })
 }, {
-  subs: ['Color'],
+  subs: ['HISTORY_COLOR'],
   object: new ColorHistory({
     el: document.querySelector('.mixin-colors')
   })

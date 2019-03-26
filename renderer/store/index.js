@@ -5,6 +5,8 @@ const mutation = (action)=>{
 }
 
 const getter = (key) => {
+  console.log(key)
+  console.log(remote.getGlobal( "Store" )[key])
   return remote.getGlobal( "Store" )[key]
 }
 

@@ -23,6 +23,7 @@ let trayApp
 const appliction = (action, event) => {
   switch (action.type) {
     case PREVIEW_IMAGE:
+      console.log(Date.now())
       pickWindow = new BrowserWindow({
         width: action.arg.width, 
         height: action.arg.height,
@@ -96,6 +97,7 @@ function startByShort() {
 function ipcMessager(main) {
 
   ipcMain.on('hide-main', function(event, arg) {
+    console.log('hideMain' + Date.now())
     main.setPosition(arg.width, arg.height)
     main.hide()
     setTimeout(() => {

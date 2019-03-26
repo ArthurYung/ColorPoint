@@ -1,5 +1,5 @@
 const { ipcRenderer, desktopCapturer } = require( "electron" );
-const { getter } = require('./store/index')
+const { getter } = require('./store')
 
 
 class App {

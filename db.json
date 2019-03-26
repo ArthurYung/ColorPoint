@@ -1,7 +1,12 @@
 {
   "shortcut": {
-    "keys": "Command+B",
+    "keys": "Command+N",
     "quit": "esc"
   },
-  "colors": []
+  "colors": [
+    {
+      "ID": "1553520968209",
+      "value": []
+    }
+  ]
 }

@@ -1,5 +1,5 @@
 const AppExtend = require('./appExtends')
-
+const { getter, mutation } = require('../store')
 class ColorHistory extends AppExtend {
   constructor(opt) {
     super()
@@ -10,7 +10,7 @@ class ColorHistory extends AppExtend {
     this.proxy()
     this.bind()
     this._render()
-    this.colors.render = ['#ffff00', 'rgba(255,255,255,1)']
+    this.colors.render = getter('HISTORY_COLOR')
   }
   proxy () {
     let self = this
@@ -26,6 +26,10 @@ class ColorHistory extends AppExtend {
     })
   }
 
+  dispatch(action) {
+    this.colors.render = action.payload
+  }
+
   _render() {
     this.view.innerHTML = this.render()
   }
@@ -35,13 +39,15 @@ class ColorHistory extends AppExtend {
     return {
       clicks: {
         handleClick () {
-          self.colors.render = []
+          mutation({
+          type: 'HISTORY_COLOR',
+          payload: []
+        })
         },
         chooseColor (event) {
           const color = event.target.dataset.color
           if (color) {
             event.stopPropagation()
-            console.log(color)
           }
         }
       }
