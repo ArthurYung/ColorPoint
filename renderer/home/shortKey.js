@@ -1,3 +1,11 @@
+/*
+ * @Description: A keyborad input listenter.
+ * @Author: Bruce.Au
+ * @LastEditors: Please set LastEditors
+ * @Date: 2019-03-21 23:19:57
+ * @LastEditTime: 2019-03-27 18:57:47
+ */
+
 const isMac = /^Mac/.test(navigator.platform)
 
 const commands = ['Command', 'Control', 'Shift','Capslock', 'Alt', 'Tap', 'Enter', 'Delete', 'Backspace']

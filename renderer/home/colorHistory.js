@@ -1,3 +1,4 @@
+const { clipboard } = require( "electron" );
 const AppExtend = require('./appExtends')
 const { getter, mutation } = require('../store')
 class ColorHistory extends AppExtend {
@@ -17,6 +18,7 @@ class ColorHistory extends AppExtend {
     this.colors = new Proxy({}, {
       set(proxy, key, value) {
         proxy[key] = value
+        console.log(value)
         self.colorRender(value)
         return true
       },
@@ -26,8 +28,8 @@ class ColorHistory extends AppExtend {
     })
   }
 
-  dispatch(action) {
-    this.colors.render = action.payload
+  dispatch() {
+    this.colors.render = getter('HISTORY_COLOR')
   }
 
   _render() {
@@ -48,6 +50,7 @@ class ColorHistory extends AppExtend {
           const color = event.target.dataset.color
           if (color) {
             event.stopPropagation()
+            clipboard.writeText(color)
           }
         }
       }

@@ -2,8 +2,8 @@
 const { app, BrowserWindow, ipcMain, Tray, globalShortcut } = require('electron')
 const { resolve } = require('path')
 const { createMenu, menuBuild } = require('./menur')
-const { changeShort, pushColor } = require('./db')
-const { actions, PREVIEW_IMAGE, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
+const { changeShort, pushColor, getColor } = require('./db')
+const { actions, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
 
 require('electron-debug')({ showDevTools: false })
 
@@ -18,33 +18,42 @@ const isMac = process.platform === 'darwin'
 let mainWindow
 let pickWindow
 let trayApp
+let shortcutCatch
 
+// 不同的action操作中间件
 const appliction = (action, event) => {
   switch (action.type) {
     case DEFAULTE_KEYS:
       changeShort('keys', action.payload)
       let keys = action.payload.toLowerCase()
       setShortCut(keys)
-      break
+      return action.payload
 
     case HISTORY_COLOR:
       pushColor(action.payload)
-      break
+      return getColor()
 
     default:
-      break
+      return action.payload
   }
 }
 
+// 注册全局快捷键
 function setShortCut(shortcut) {
   shortcut = shortcut.toLowerCase()
+  // 如果指令有问题，则不注册
   if (!shortcut || shortcut.indexOf('+') < 0) {
     return
   }
-  globalShortcut.unregisterAll()
+  // 注册之前删除上一次注册的全局快捷键
+  if (shortcutCatch) {
+    globalShortcut.unregister(shortcutCatch)
+  }
+  shortcutCatch = shortcut
   globalShortcut.register(shortcut, startByShort);
 }
 
+// 全局变量初始化
 function createStore (actions) {
   global.Store = {}
   actions.forEach(action => {
@@ -52,27 +61,31 @@ function createStore (actions) {
   })
 }
 
+// 连接到两个window
 function connect (appliction) {
   ipcMain.on('connct-store-context', (event, action) => {
-    appliction(action)
-    global.Store[action.type] = action.payload
+    global.Store[action.type] = appliction(action)
     mainWindow && mainWindow.webContents.send('connct-store-provider', action)
     pickWindow && pickWindow.webContents.send('connct-store-provider', action)
   })
 }
 
+// 创建tray
 function createtTray(icon) {
   let trayMenu = menuBuild(startByShort)
   trayApp = new Tray(icon)
   trayApp.setContextMenu(trayMenu)
 }
 
+// 快捷键对应的响应事件
 function startByShort() {
   mainWindow.webContents.send('shortcut-show');
 }
 
+// 绑定ipc消息
 function ipcMessager(main) {
 
+  // 开始选择颜色
   ipcMain.on('start-point', function(event, arg) {
     main.setPosition(arg.width, arg.height)
     main.hide()
@@ -80,8 +93,8 @@ function ipcMessager(main) {
     pickWindow.show()
     pickWindow.webContents.send('start-point-pr')
   })
-
-
+  
+  // 关闭颜色选择窗口并打开主窗口
   ipcMain.on('close-pick-window', function(e, arg) {
     pickWindow.hide()
     main.center()
@@ -104,6 +117,7 @@ async function createWindow () {
     fullscreenWindowTitle: true,
     show: true
   })
+  
   pickWindow = new BrowserWindow({
     width: 10, 
     height: 10,
@@ -119,7 +133,7 @@ async function createWindow () {
     transparent: true,
     show: false
   })
-  pickWindow.loadFile(PICK_HTML)
+
   ipcMessager(mainWindow)
   createMenu()
   createtTray(WHILTE_ICON)
@@ -127,14 +141,12 @@ async function createWindow () {
   connect(appliction)
   setShortCut(global.Store.DEFAULTE_KEYS)
 
+  pickWindow.loadFile(PICK_HTML)
+  mainWindow.loadFile(MAIN_HTML)
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
-
-  // and load the index.html of the app.
-  mainWindow.loadFile(MAIN_HTML)
-
-  // and bind default shortcut keys by db.
 
   mainWindow.on('closed', function () {
     app.quit()
@@ -143,22 +155,15 @@ async function createWindow () {
 
 app.on('ready', createWindow)
 
-// Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
 
 app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow()
   }
 })
 app.setName('Color Point')
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

@@ -14,6 +14,9 @@ exports.getShort = name => {
 }
 
 exports.pushColor = color => {
+  if (Array.isArray(color) && color.length === 0) {
+    return db.set('colors', []).write()
+  }
   const _COLOR_ = db.get('colors')
   const size = _COLOR_.size().value()
   if (size >= 5) {
@@ -26,5 +29,7 @@ exports.pushColor = color => {
 }
 
 exports.getColor = () => {
-  return db.get('colors').value()
+  return db.get('colors').value().map(color => {
+    return color.value
+  })
 }
