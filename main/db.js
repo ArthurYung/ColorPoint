@@ -19,7 +19,7 @@ exports.pushColor = color => {
   }
   const _COLOR_ = db.get('colors')
   const size = _COLOR_.size().value()
-  if (size >= 5) {
+  if (size >= 9) {
     _COLOR_.remove(_COLOR_.first().value()).write()
   }
   _COLOR_.push({

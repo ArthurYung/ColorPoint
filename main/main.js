@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, Tray, globalShortcut } = require('electron')
+const { app, BrowserWindow, ipcMain, Tray, globalShortcut, Notification } = require('electron')
 const { resolve } = require('path')
 const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor, getColor } = require('./db')
@@ -18,6 +18,7 @@ const isMac = process.platform === 'darwin'
 let mainWindow
 let pickWindow
 let trayApp
+let notification
 let shortcutCatch
 
 // 不同的action操作中间件
@@ -72,9 +73,12 @@ function connect (appliction) {
 
 // 创建tray
 function createtTray(icon) {
-  let trayMenu = menuBuild(startByShort)
+  let trayMenu = menuBuild(mainWindow, startByShort)
   trayApp = new Tray(icon)
   trayApp.setContextMenu(trayMenu)
+  trayApp.on('right-click', () => { // 右键点击
+    if (isMac) mainWindow.show()
+  })
 }
 
 // 快捷键对应的响应事件
@@ -100,12 +104,22 @@ function ipcMessager(main) {
     main.center()
     main.show()
   })
+
+  // 复制颜色成功显示通知窗
+  ipcMain.on('show-notification', function() {
+    notification.show()
+  })
 }
 
 
 async function createWindow () {
   // Create the browser window.
-  
+  notification = new Notification({
+    title: 'Color Point',
+    body: '颜色已复制',
+    silent: true
+  })
+
   mainWindow = new BrowserWindow({
     width: 400,
     height: isMac ? 390 : 410,
@@ -115,7 +129,7 @@ async function createWindow () {
     icon: APP_ICON,
     darkTheme: true,
     fullscreenWindowTitle: true,
-    show: true
+    show: false
   })
   
   pickWindow = new BrowserWindow({
@@ -135,12 +149,11 @@ async function createWindow () {
   })
 
   ipcMessager(mainWindow)
-  createMenu()
+  createMenu(mainWindow)
   createtTray(WHILTE_ICON)
   createStore(actions)
   connect(appliction)
   setShortCut(global.Store.DEFAULTE_KEYS)
-
   pickWindow.loadFile(PICK_HTML)
   mainWindow.loadFile(MAIN_HTML)
 
@@ -148,7 +161,20 @@ async function createWindow () {
     mainWindow.show()
   })
 
-  mainWindow.on('closed', function () {
+  mainWindow.on('close', function(event) {
+    mainWindow.hide(); 
+    mainWindow.setSkipTaskbar(true);
+    event.preventDefault();
+  })
+
+  mainWindow.on('closed', function (e) {
+    pickWindow.destroy()
+    mainWindow = null
+    // app.quit()
+  })
+
+  pickWindow.on('closed', function() {
+    pickWindow = null
     app.quit()
   })
 }
@@ -165,5 +191,6 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow()
   }
+  mainWindow.isVisible() || mainWindow.show()
 })
 app.setName('Color Point')

@@ -1,4 +1,4 @@
-const { clipboard } = require( "electron" );
+const { clipboard, ipcRenderer } = require( "electron" );
 const AppExtend = require('./appExtends')
 const { getter, mutation } = require('../store')
 class ColorHistory extends AppExtend {
@@ -51,6 +51,7 @@ class ColorHistory extends AppExtend {
           if (color) {
             event.stopPropagation()
             clipboard.writeText(color)
+            ipcRenderer.send('show-notification')
           }
         }
       }

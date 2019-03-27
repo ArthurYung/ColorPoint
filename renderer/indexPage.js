@@ -4,7 +4,6 @@ const Keyboard = require('./home/keyboard')
 const ColorHistory = require('./home/colorHistory')
 const size = {width: screen.availWidth, height: screen.availHeight}
 
-
 const startCapture = ()=> {
   ipcRenderer.send('start-point', size)
 }

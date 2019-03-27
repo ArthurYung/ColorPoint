@@ -25,6 +25,7 @@ class App {
     this._init()
   }
   _init() {
+    console.log('create' + Date.now())
     this.drawEvent = this.drawEvent.bind(this)
     this.hideClip = this.hideClip.bind(this)
     this.showClip = this.showClip.bind(this)
@@ -34,7 +35,7 @@ class App {
     this.createCanvas()
     this.createMenu()
     this.addEventListener()
-    document.body.click()
+    console.log('created' + Date.now())
   }
   createCanvas() {
     this.video = document.createElement('video')
@@ -135,7 +136,8 @@ class App {
       });
       video.setAttribute('src', URL.createObjectURL(stream));
     }).catch(err => {
-      console.log(err)
+      ipcRenderer.send('close-pick-window')
+      this.exitProject()
     })
   }
   addEventListener() {
@@ -167,14 +169,18 @@ class App {
     while (target !== document.body) {
       if (target.dataset.value) {
         this.valueType = +target.dataset.value
-        document.querySelectorAll('.checked-value').forEach(dom => {
-          dom.className = ''
-        })
-        target.firstElementChild.className = 'checked-value'
+        this.changeClass()
         break
       }
       target = target.parentNode
     }
+  }
+
+  changeClass() {
+    document.querySelectorAll('.checked-value').forEach(dom => {
+      dom.className = ''
+    })
+    this.menu.querySelector(`div[data-value="${this.valueType}"]`).firstElementChild.className = 'checked-value'
   }
 
   menuToggle(e) {
@@ -278,6 +284,7 @@ class App {
     })
     clipboard.writeText(this.currentColor)
     ipcRenderer.send('close-pick-window')
+    ipcRenderer.send('show-notification')
     this.exitProject()
   }
 
@@ -286,6 +293,7 @@ class App {
     this.valueType = 1
     this.inMenu = false
     this.currentColor = ''
+    this.changeClass()
     if (this.menu.parentNode === document.body) {
       document.body.removeChild(this.menu)
     }

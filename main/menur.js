@@ -1,34 +1,52 @@
-const { Menu } = require('electron')
+const { Menu, app, BrowserWindow } = require('electron')
 const { platform } = require('process')
 const isMac = platform === 'darwin'
 
-const trayTemplate = [
-  {
-    label: 'Help',
-    role: 'help'
-  },
-  {
-    label: 'Quit',
-    role: 'quit'
-  }
-]
 
+exports.menuBuild = (main, start) => {
+  trayTemplate = [
+    {
+      label: 'Start',
+      click: start
+    },
+    {
+      label: 'Show',
+      click () {
+        main.show()
+      }
+    },
+    {
+      label: 'Help',
+      click() {
+        console.log(BrowserWindow.getAllWindows())
 
-exports.menuBuild = unshiftFn => {
-  trayTemplate.unshift({
-    label: 'Start',
-    click: unshiftFn
-  })
+      }
+    },
+    {
+      label: 'Quit',
+      click () {
+        main.destroy()
+      }
+    }
+  ]
   return  Menu.buildFromTemplate(trayTemplate)
 } 
 
-exports.createMenu = () => {
+exports.createMenu = (main) => {
   const template = [
     {
       label: 'Color Point',
       submenu: [
-        { role: 'help'},
-        { role: 'quit'}
+        {
+          label: 'Help',
+          role: 'help'
+        },
+        {
+          label: 'Quit',
+          click () {
+            main.destroy()
+          }
+        }
       ]
     },
     {
@@ -37,7 +55,9 @@ exports.createMenu = () => {
     },
     {
       label: 'Quit',
-      role: 'quit'
+      click () {
+         main.destroy()
+      }
     }
   ]
   const menu = Menu.buildFromTemplate(template)
