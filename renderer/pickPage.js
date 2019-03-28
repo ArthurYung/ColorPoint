@@ -25,20 +25,20 @@ class App {
     this._init()
   }
   _init() {
-    console.log('create' + Date.now())
     this.drawEvent = this.drawEvent.bind(this)
     this.hideClip = this.hideClip.bind(this)
     this.showClip = this.showClip.bind(this)
     this.changeType = this.changeType.bind(this)
     this.menuToggle = this.menuToggle.bind(this)
     this.handleSend = this.handleSend.bind(this)
+    this.playVideo = this.playVideo.bind(this)
     this.createCanvas()
     this.createMenu()
     this.addEventListener()
-    console.log('created' + Date.now())
   }
   createCanvas() {
     this.video = document.createElement('video')
+    this.video.autoplay = 'autoplay'
     this.background = document.createElement('canvas')
     this.clipView = document.createElement('div')
     this.colorValue = document.createElement('span')
@@ -90,8 +90,7 @@ class App {
     this.getScreenImage()
   }
   
-  asyncScreenImage() {
-    return new Promise((resolve, reject) => {
+  getScreenImage() {
       desktopCapturer.getSources({
         types: ['screen'], 
         thumbnailSize: {width: 1,height: 1}
@@ -112,35 +111,25 @@ class App {
             },
           }
         },
-        stream => {resolve(stream)},
-        err => {reject(err)})
+        stream => {
+          this.video.setAttribute('src', URL.createObjectURL(stream));
+        },
+        err => {console.log(err)})
       })
-    })
   }
-  getScreenImage() {
-    let self = this
-    this.asyncScreenImage().then(stream => {
-      const video = document.createElement('video')
-      video.addEventListener('play', function() {
-        self.video.pause()
-        self.bg.drawImage(video, 0, 0, self.size.width, self.size.height)
-        self.imgData = self.bg.getImageData(0, 0, self.size.width, self.size.height)
-        self.imgGeted = true
-        self.view.appendChild(self.background)
-        self.view.appendChild(self.clipView)
-        document.body.appendChild(self.menu)
-      });
 
-      video.addEventListener('canplay', function() {
-        video.play();
-      });
-      video.setAttribute('src', URL.createObjectURL(stream));
-    }).catch(err => {
-      ipcRenderer.send('close-pick-window')
-      this.exitProject()
-    })
+  playVideo() {
+    this.video.pause()
+    this.bg.drawImage(this.video, 0, 0, this.size.width, this.size.height)
+    this.imgData = this.bg.getImageData(0, 0, this.size.width, this.size.height)
+    this.imgGeted = true
+    this.view.appendChild(this.background)
+    // this.view.appendChild(this.clipView)
+    document.body.appendChild(this.menu)
   }
+
   addEventListener() {
+    this.video.addEventListener('play', this.playVideo)
     this.background.addEventListener('mouseenter', this.showClip)
     this.menu.addEventListener('mouseenter', this.hideClip)
     this.button.addEventListener('click', this.menuToggle)
@@ -158,10 +147,10 @@ class App {
 
   showClip(e) {
     this.inMenu = false
-    this.view.appendChild(this.clipView)
     this.setPosition(e)
     this.getClipData()
     this.drawPoint()
+    this.view.appendChild(this.clipView)
   }
 
   changeType(e) {
@@ -283,19 +272,26 @@ class App {
       payload: this.currentColor
     })
     clipboard.writeText(this.currentColor)
-    ipcRenderer.send('close-pick-window')
-    ipcRenderer.send('show-notification')
     this.exitProject()
+    setTimeout(()=>{
+      ipcRenderer.send('close-pick-window')
+      ipcRenderer.send('show-notification')
+    }, 30)
   }
 
   exitProject() {
-    this.view.innerHTML = ''
     this.valueType = 1
     this.inMenu = false
     this.currentColor = ''
     this.changeClass()
     if (this.menu.parentNode === document.body) {
       document.body.removeChild(this.menu)
+    }
+    if (this.clipView.parentNode === this.view) {
+      this.view.removeChild(this.clipView)
+    }
+    if (this.background.parentNode === this.view) {
+      this.view.removeChild(this.background)
     }
   }
 }

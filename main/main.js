@@ -135,8 +135,8 @@ async function createWindow () {
   pickWindow = new BrowserWindow({
     width: 10, 
     height: 10,
-    left: 0,
-    top: 0,
+    x: 0,
+    y: 0,
     fullscreen: !isMac || undefined,
     resizable: false,
     movable: false,
