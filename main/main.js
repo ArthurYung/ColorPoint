@@ -79,6 +79,9 @@ function createtTray(icon) {
   trayApp.on('right-click', () => { // 右键点击
     if (isMac) mainWindow.show()
   })
+  trayApp.on('click', () => { // 右键点击
+    mainWindow.show()
+  })
 }
 
 // 快捷键对应的响应事件
@@ -159,6 +162,10 @@ async function createWindow () {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
+  })
+
+  mainWindow.on('show', function() {
+    mainWindow.setSkipTaskbar(false)
   })
 
   mainWindow.on('close', function(event) {
