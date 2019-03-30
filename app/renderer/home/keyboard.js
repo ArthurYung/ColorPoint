@@ -8,7 +8,7 @@ class KeyboardApp extends AppExtend {
     this.start = opt.start || new Function()
     this.shortKey = new ShortKeys()
     this.keyboard = getter('DEFAULTE_KEYS')
-    this.buttonText = "Point Your Color"
+    this.buttonText = "Start Picking Colors"
     this.type = 1
     this.init()
   }
