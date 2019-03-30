@@ -5,7 +5,7 @@ const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor, getColor } = require('./db')
 const { actions, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
 
-require('electron-debug')({ showDevTools: false })
+// require('electron-debug')({ showDevTools: false })
 
 const ASSETS_PATH = resolve(__dirname, 'assets')
 const APP_ICON = resolve(ASSETS_PATH,  'image/icon_app.png')

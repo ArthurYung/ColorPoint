@@ -1,8 +1,8 @@
 {
   "name": "color-point",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
-  "description": "A minimal Electron application",
+  "description": "A colour picking app based on Electron",
   "main": "./app/main.js",
   "scripts": {
     "start": "electron .",
@@ -12,13 +12,12 @@
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "Color",
+    "Picker",
+    "App"
   ],
   "author": "Bruce.Au",
-  "license": "CC0-1.0",
+  "license": "TIM",
   "devDependencies": {
     "electron": "^4.0.7",
     "electron-debug": "^1.5.0"
