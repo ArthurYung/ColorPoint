@@ -132,7 +132,7 @@ async function createWindow () {
     icon: APP_ICON,
     darkTheme: true,
     fullscreenWindowTitle: true,
-    show: true
+    show: false
   })
   
   pickWindow = new BrowserWindow({
