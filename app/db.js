@@ -1,16 +1,22 @@
 const low = require('lowdb')
+const { resolve } = require('path')
 const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync('db.json')
+const json = resolve(__dirname, 'db.json')
+
+const adapter = new FileSync(json)
 const db = low(adapter)
 
-db.defaults({ shortcut: {}, colors: [] }).write()
+const isMac = process.platform === 'darwin'
+const defaultShort = `${isMac ? 'Command' : 'Control'}+Alt+G`
 
-exports.changeShort = (name, key) => {
-  db.set('shortcut.' + String(name), key).write()
+db.defaults({ shortcut: defaultShort, colors: [] }).write()
+
+exports.changeShort = key => {
+  db.set('shortcut', key).write()
 }
 
-exports.getShort = name => {
-  return db.get('shortcut.' + String(name)).value()
+exports.getShort = () => {
+  return db.get('shortcut').value()
 }
 
 exports.pushColor = color => {

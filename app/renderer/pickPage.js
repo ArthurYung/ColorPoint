@@ -13,6 +13,7 @@ class App {
       value: 2,
       text: 'RGBA'
     }]
+    this.startType = false
     this.imgData = []
     this.clipData = []
     this.radius = 60
@@ -84,7 +85,8 @@ class App {
     return labels
   }
 
-  start() {
+  start(type) {
+    this.startType = type
     this.imgGeted = false
     this.exitProject()
     this.getScreenImage()
@@ -274,7 +276,7 @@ class App {
     clipboard.writeText(this.currentColor)
     this.exitProject()
     setTimeout(()=>{
-      ipcRenderer.send('close-pick-window')
+      ipcRenderer.send('close-pick-window', this.startType)
       ipcRenderer.send('show-notification')
     }, 30)
   }
@@ -299,6 +301,6 @@ const app = new App({
   el: document.querySelector('.view')
 })
 
-ipcRenderer.on('start-point-pr', function() {
-  app.start()
+ipcRenderer.on('start-point-pr', function(event, type) {
+  app.start(type)
 })

@@ -5,7 +5,7 @@ const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor, getColor } = require('./db')
 const { actions, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
 
-// require('electron-debug')({ showDevTools: false })
+require('electron-debug')({ showDevTools: false })
 
 const ASSETS_PATH = resolve(__dirname, 'assets')
 const APP_ICON = resolve(ASSETS_PATH,  'image/icon_app.png')
@@ -25,7 +25,7 @@ let shortcutCatch
 const appliction = (action, event) => {
   switch (action.type) {
     case DEFAULTE_KEYS:
-      changeShort('keys', action.payload)
+      changeShort(action.payload)
       let keys = action.payload.toLowerCase()
       setShortCut(keys)
       return action.payload
@@ -41,7 +41,7 @@ const appliction = (action, event) => {
 
 // 注册全局快捷键
 function setShortCut(shortcut) {
-  shortcut = shortcut.toLowerCase()
+  shortcut = shortcut && shortcut.toLowerCase()
   // 如果指令有问题，则不注册
   if (!shortcut || shortcut.indexOf('+') < 0) {
     return
@@ -94,18 +94,21 @@ function ipcMessager(main) {
 
   // 开始选择颜色
   ipcMain.on('start-point', function(event, arg) {
+    const mainVisble = main.isVisible()
     main.setPosition(arg.width, arg.height)
     main.hide()
     pickWindow.setSize(arg.width,  arg.height)
     pickWindow.show()
-    pickWindow.webContents.send('start-point-pr')
+    pickWindow.webContents.send('start-point-pr', mainVisble)
   })
   
   // 关闭颜色选择窗口并打开主窗口
-  ipcMain.on('close-pick-window', function(e, arg) {
+  ipcMain.on('close-pick-window', function(e, type) {
     pickWindow.hide()
-    main.center()
-    main.show()
+    if (type) {
+      main.center()
+      main.show()
+    }
   })
 
   // 复制颜色成功显示通知窗
@@ -150,8 +153,6 @@ async function createWindow () {
     transparent: true,
     show: false
   })
-  pickWindow.loadFile(PICK_HTML)
-  mainWindow.loadFile(MAIN_HTML)
 
   ipcMessager(mainWindow)
   createMenu(mainWindow)
@@ -160,24 +161,26 @@ async function createWindow () {
   connect(appliction)
   setShortCut(global.Store.DEFAULTE_KEYS)
 
+  pickWindow.loadFile(PICK_HTML)
+  mainWindow.loadFile(MAIN_HTML)
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
 
   mainWindow.on('show', function() {
-    mainWindow.setSkipTaskbar(false)
+    !isMac && mainWindow.setSkipTaskbar(false)
   })
   
   mainWindow.on('close', function(event) {
-    mainWindow.hide(); 
-    mainWindow.setSkipTaskbar(true);
     event.preventDefault();
+    mainWindow.hide(); 
+    !isMac && mainWindow.setSkipTaskbar(true);
   })
 
   mainWindow.on('closed', function (e) {
     pickWindow.destroy()
     mainWindow = null
-    // app.quit()
   })
 
   pickWindow.on('closed', function() {

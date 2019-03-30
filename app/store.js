@@ -6,7 +6,7 @@ const HISTORY_COLOR = 'HISTORY_COLOR'
 const actions = [
   {
     type: DEFAULTE_KEYS,
-    default: getShort('keys')
+    default: getShort()
   },
   {
     type: HISTORY_COLOR,

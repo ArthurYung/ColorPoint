@@ -6,7 +6,8 @@
   "main": "./app/main.js",
   "scripts": {
     "start": "electron .",
-    "biuld": "electron-packager . Color-Point --platform=win32 --overwrite"
+    "build:win": "electron-packager . Color-Point --platform=win32 --icon=./icon.icn  --overwrite",
+    "build:mac": "electron-packager . Color-Point --platform=darwin --icon=./icon.icns --overwrite --darwinDarkModeSupport=true"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
