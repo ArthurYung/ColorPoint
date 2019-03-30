@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        font-family:  'PingFang SC', 'Arial', sans-serif;
+      }
+      input,button:focus {outline:none;}
+    </style>
+    <link rel="stylesheet" href="../renderer/css/home.css">
+  </head>
+  <body>
+    <main>
+       <article>
+          <img class="main-logo" src="./image/logo.png" alt="">
+          <div style="margin-bottom: 6px" class="main-title">
+            <span class="main-text version">v1.0.0</span>
+          </div>
+       </article>
+       <article>
+        <div class="article-app mixin-keyboard"></div>
+       </article>
+       <article>
+        <div class="article-app mixin-colors"></div>
+       </article>
+        <div class="main-title footer">
+          <span class="main-text">By Bruce.Au</span>
+        </div>
+    </main>
+    <script>
+      require('../renderer/indexPage.js')
+    </script>
+  </body>
+</html>

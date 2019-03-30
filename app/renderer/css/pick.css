@@ -1,0 +1,118 @@
+body, html{
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+}
+
+canvas {
+  position: absolute;
+  left: 0;
+  bottom: 0
+}
+
+.clip-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: auto
+}
+.clip-view canvas {
+  border-radius:  50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px solid #000000;
+}
+
+.clip-view span {
+  display: inline-block;
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, .4);
+  line-height: 20px;
+  font-size: 10px;
+  color: #ffffff;
+  padding: 0 4px;
+  white-space:nowrap;
+}
+
+
+.menu-view {
+  position: absolute;
+  left: 0;
+  bottom: 10%;
+  background-color: rgba(255,255,255,.9);
+  border-radius: 0 12px 12px 0;
+  width: 140px;
+  height: 60px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: transform .4s ease-out
+}
+
+.hide-view {
+  transform: translate(-120px, 0)
+}
+
+.menu-view a {
+  background: none;
+  border:none;
+  display: block;
+  position: absolute;
+  width: 16px;
+  height: 20px;
+  right: 4px;
+  top: 30px;
+  text-align: center;
+  font-size: 20px;
+  color: #6868688c
+}
+
+.menu-view a:hover {
+  color: #292929
+}
+
+.menu-view a.menu-show::before {
+  content: '‹'
+}
+
+.menu-view a.menu-hide::before {
+  content: '›'
+}
+
+.canvas-label {
+  padding: 0 14px;
+  line-height: 30px;
+  font-size: 14px;
+  width: 70%
+}
+
+.canvas-label:hover>span:first-child {
+  border-color: #3a3a3a
+}
+
+.canvas-label>span:first-child {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #9a9a9a;
+  margin-right: 8px;
+  margin-top: 4px;
+  float: left;
+}
+
+.canvas-label > span.checked-value::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #9343e9
+}
