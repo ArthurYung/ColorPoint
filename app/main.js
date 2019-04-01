@@ -77,9 +77,13 @@ function createtTray(icon) {
   trayApp = new Tray(icon)
   trayApp.setContextMenu(trayMenu)
   trayApp.on('right-click', () => { // 右键点击
-    if (isMac) mainWindow.show()
+    if (isMac) {
+      mainWindow.center()
+      mainWindow.show()
+    }
   })
   trayApp.on('click', () => { // 右键点击
+    mainWindow.center()
     mainWindow.show()
   })
 }

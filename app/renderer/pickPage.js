@@ -46,9 +46,9 @@ class App {
     this.canvas = document.createElement('canvas')
     this.bg = this.background.getContext('2d')
     this.ctx = this.canvas.getContext('2d')
+    this.canvas.width = this.canvas.height = 2 * this.radius
     this.background.width =  this.size.width
     this.background.height =  this.size.height
-    this.canvas.width = this.canvas.height = 2 * this.radius
     this.clipView.className = 'clip-view'
     this.clipView.style.width = `${2 * this.radius}px`
     this.clipView.style.height = `${2 * this.radius}px`
@@ -126,7 +126,7 @@ class App {
     this.imgData = this.bg.getImageData(0, 0, this.size.width, this.size.height)
     this.imgGeted = true
     this.view.appendChild(this.background)
-    // this.view.appendChild(this.clipView)
+    this.video.src = ""
     document.body.appendChild(this.menu)
   }
 
@@ -286,6 +286,10 @@ class App {
     this.inMenu = false
     this.currentColor = ''
     this.changeClass()
+    this.imgData = []
+    this.clipData = []
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this.bg.clearRect(0, 0, this.background.width, this.background.height)
     if (this.menu.parentNode === document.body) {
       document.body.removeChild(this.menu)
     }
