@@ -12,6 +12,9 @@ class App {
     }, {
       value: 2,
       text: 'RGBA'
+    }, {
+      value: 3,
+      text: '(rgba)透明度'
     }]
     this.startType = false
     this.imgData = []
@@ -26,17 +29,32 @@ class App {
     this._init()
   }
   _init() {
-    this.drawEvent = this.drawEvent.bind(this)
-    this.hideClip = this.hideClip.bind(this)
-    this.showClip = this.showClip.bind(this)
-    this.changeType = this.changeType.bind(this)
-    this.menuToggle = this.menuToggle.bind(this)
-    this.handleSend = this.handleSend.bind(this)
-    this.playVideo = this.playVideo.bind(this)
     this.createCanvas()
     this.createMenu()
+    this.createProxy()
     this.addEventListener()
   }
+
+  createProxy() {
+    let self = this
+    this.alpha = new Proxy({}, {
+      set(proxy, key, value) {
+        self.changeRanger(key, value)
+        proxy[key] = value
+        return true
+      }
+    })
+  }
+
+  changeRanger(key, value) {
+    if (key === 'opacity') {
+      this.input.getElementsByTagName('span')[0].innerText = value
+    }
+    if (key === 'background') {
+      this.input.getElementsByTagName('i')[0].style.background = value
+    }
+  }
+
   createCanvas() {
     this.video = document.createElement('video')
     this.video.autoplay = 'autoplay'
@@ -64,10 +82,34 @@ class App {
     this.button.className = 'menu-show'
     this.menu.className = 'menu-view'
     this.labels = this.createLable()
+    this.input = this.createRanger()
     this.labels.forEach(label => {
       this.menu.appendChild(label)
     })
     this.menu.appendChild(this.button)
+    this.menu.appendChild(this.input)
+  }
+
+  createRanger() {
+    let div = document.createElement('div')
+    let input = document.createElement('input')
+    let value = document.createElement('span')
+    let background = document.createElement('i')
+    div.className = 'range-box'
+    input.type = 'range'
+    input.value = 5
+    input.min = 0
+    input.max = 10
+    div.appendChild(background)
+    div.appendChild(input)
+    div.appendChild(value)
+    this.bindEvent(background, 'click', function() {
+      this.alpha.background = this.alpha.background === '#000000' ? '#ffffff' : '#000000'
+    })
+    this.bindEvent(input, 'input', function(e) {
+      this.alpha.opacity = e.target.value / 10
+    })
+    return div
   }
 
   createLable () {
@@ -128,18 +170,26 @@ class App {
     this.view.appendChild(this.background)
     this.video.src = ""
     document.body.appendChild(this.menu)
+    this.alpha.background = '#ffffff'
+    this.alpha.opacity = 0.5
+  }
+
+  bindEvent(el, type, fn) {
+    fn = fn.bind(this)
+    el = typeof el === 'string' ? this[el] : el
+    el.addEventListener(type, fn)
   }
 
   addEventListener() {
-    this.video.addEventListener('play', this.playVideo)
-    this.background.addEventListener('mouseenter', this.showClip)
-    this.menu.addEventListener('mouseenter', this.hideClip)
-    this.button.addEventListener('click', this.menuToggle)
-    this.canvas.addEventListener('click', this.handleSend)
+    this.bindEvent('video', 'play', this.playVideo)
+    this.bindEvent('background', 'mouseenter', this.showClip)
+    this.bindEvent('menu', 'mouseenter', this.hideClip)
+    this.bindEvent('button', 'click', this.menuToggle)
+    this.bindEvent('canvas', 'click', this.handleSend)
     this.labels.forEach(label => {
-      label.addEventListener('click', this.changeType)
+      this.bindEvent(label, 'click', this.changeType)
     })
-    document.body.addEventListener('mousemove', this.drawEvent)
+    this.bindEvent(document.body, 'mousemove', this.drawEvent)
   }
 
   hideClip() {

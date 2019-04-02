@@ -45,8 +45,8 @@ canvas {
   bottom: 10%;
   background-color: rgba(255,255,255,.9);
   border-radius: 0 12px 12px 0;
-  width: 140px;
-  height: 60px;
+  width: 160px;
+  height: 110px;
   padding: 10px 0;
   cursor: pointer;
   transition: transform .4s ease-out
@@ -66,7 +66,7 @@ canvas {
   right: 4px;
   top: 30px;
   text-align: center;
-  font-size: 20px;
+  font-size: 16px;
   color: #6868688c
 }
 
@@ -115,4 +115,42 @@ canvas {
   height: 14px;
   border-radius: 50%;
   background-color: #9343e9
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 80px;
+  height: 2px;
+  border-radius: 2px; /*这个属性设置使填充进度条时的图形为圆角*/
+  background-color: #dedede
+}
+input[type=range]::-webkit-slider-thumb {
+   -webkit-appearance: none;
+   appearance: none; /*//这三个是去掉滑块原有的默认样式，划重点！！*/
+   -webkit-box-shadow:0 0 2px ; /*设置滑块的阴影*/
+   width: 12px;
+   height: 12px;
+   background: #fff;
+   border-radius: 50%;
+   border: 2px solid #9343e9;
+}
+.range-box {
+  position: relative;
+}
+.range-box i{
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #acacac;
+  margin: 0 8px 0 16px
+}
+.range-box input {
+  position: absolute;
+  top: 10px;
+  left: 40px;
+}
+
+.range-box span {
+  margin-left: 90px;
+  font-size: 12px
 }
