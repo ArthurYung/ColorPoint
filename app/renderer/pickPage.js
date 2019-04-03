@@ -2,6 +2,7 @@ const { ipcRenderer, desktopCapturer, clipboard } = require( "electron" );
 const { mutation } = require('./store')
 
 const getRGB = (str) => {
+  if (!str) return [,,,]
   const [r, g, b] = str.replace(/^(rgba\()(.*)(\))$/, '$2').split(',')
   return [r, g, b]
 }
@@ -81,9 +82,8 @@ class App {
     this.canvas = document.createElement('canvas')
     this.bg = this.background.getContext('2d')
     this.ctx = this.canvas.getContext('2d')
-    this.canvas.width = this.canvas.height = 2 * this.radius
-    this.background.width =  this.size.width
-    this.background.height =  this.size.height
+
+
     this.clipView.className = 'clip-view'
     this.clipView.style.width = `${2 * this.radius}px`
     this.clipView.style.height = `${2 * this.radius}px`
@@ -149,7 +149,9 @@ class App {
   start(type) {
     this.startType = type
     this.imgGeted = false
-    this.exitProject()
+    this.background.width =  this.size.width
+    this.background.height =  this.size.height
+    this.canvas.width = this.canvas.height = 2 * this.radius
     this.getScreenImage()
   }
   
@@ -283,6 +285,7 @@ class App {
     let [x, y] = [~~(this.current.x - this.radius / this.range), ~~(this.current.y - this.radius / this.range)]
     let data = this.imgData.data
     let index, r, g, b, a
+    if (!data) return
     for (let i = 0; i < this.clipRange; i ++) {
       for (let j = 0; j < this.clipRange; j ++) {
         index = ~~((y + i) * this.imgData.width + x + j)
@@ -382,8 +385,10 @@ class App {
     this.changeClass()
     this.imgData = []
     this.clipData = []
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    this.bg.clearRect(0, 0, this.background.width, this.background.height)
+    this.canvas.width = this.canvas.height = 0
+    this.background.width = this.background.height = 0
+    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    // this.bg.clearRect(0, 0, this.background.width, this.background.height)
     if (this.menu.parentNode === document.body) {
       document.body.removeChild(this.menu)
     }
