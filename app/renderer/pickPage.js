@@ -1,5 +1,10 @@
 const { ipcRenderer, desktopCapturer, clipboard } = require( "electron" );
 const { mutation } = require('./store')
+
+const getRGB = (str) => {
+  const [r, g, b] = str.replace(/^(rgba\()(.*)(\))$/, '$2').split(',')
+  return [r, g, b]
+}
 class App {
   constructor(opt) {
     this.size = {
@@ -19,8 +24,8 @@ class App {
     this.startType = false
     this.imgData = []
     this.clipData = []
-    this.radius = 60
-    this.range = 14
+    this.radius = 80
+    this.range = 11
     this.valueType = 1
     this.inMenu = false
     this.currentColor = ''
@@ -104,9 +109,11 @@ class App {
     div.appendChild(input)
     div.appendChild(value)
     this.bindEvent(background, 'click', function() {
-      this.alpha.background = this.alpha.background === '#000000' ? '#ffffff' : '#000000'
+      if (this.valueType !== 3) return
+      this.alpha.background = this.alpha.background === 'rgba(255,255,255,1)' ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)'
     })
     this.bindEvent(input, 'input', function(e) {
+      if (this.valueType !== 3) return
       this.alpha.opacity = e.target.value / 10
     })
     return div
@@ -170,7 +177,7 @@ class App {
     this.view.appendChild(this.background)
     this.video.src = ""
     document.body.appendChild(this.menu)
-    this.alpha.background = '#ffffff'
+    this.alpha.background = '#rgba(255,255,255,1)'
     this.alpha.opacity = 0.5
   }
 
@@ -185,7 +192,7 @@ class App {
     this.bindEvent('background', 'mouseenter', this.showClip)
     this.bindEvent('menu', 'mouseenter', this.hideClip)
     this.bindEvent('button', 'click', this.menuToggle)
-    this.bindEvent('canvas', 'click', this.handleSend)
+    this.bindEvent('canvas', 'mousedown', this.handleMousedown)
     this.labels.forEach(label => {
       this.bindEvent(label, 'click', this.changeType)
     })
@@ -193,7 +200,9 @@ class App {
   }
 
   hideClip() {
-    this.view.removeChild(this.clipView)
+    if (this.clipView.parentNode === this.view) {
+      this.view.removeChild(this.clipView)
+    }
     this.inMenu = true
   }
 
@@ -222,6 +231,11 @@ class App {
       dom.className = ''
     })
     this.menu.querySelector(`div[data-value="${this.valueType}"]`).firstElementChild.className = 'checked-value'
+    if (this.valueType === 3) {
+      this.input.classList.add('is-alpha')
+    } else {
+      this.input.classList.remove('is-alpha')
+    }
   }
 
   menuToggle(e) {
@@ -264,14 +278,14 @@ class App {
         g = data[index * 4 + 1]
         b = data[index * 4 + 2]
         a = data[index * 4 + 3] / 255
-        this.clipData.push(`rgba(${r}, ${g}, ${b}, ${a})`)
+        this.clipData.push(`rgba(${r},${g},${b},${a})`)
       }
     }
   }
 
   drawPoint () {
     let ctx = this.ctx
-    let resize = this.radius * 2 - this.range * this.clipRange
+    let resize = this.radius - this.range * this.clipRange / 2
     let length = this.clipData.length
     let current = ~~(length / 2)
     let x, y, cp = {}
@@ -304,18 +318,39 @@ class App {
   }
   setValue(val) {
     let text = ''
+    this.currentRGB = getRGB(val)
     if (this.valueType === 1) {
       text = '#'
-      val.replace(/^(rgba\()(.*)(\))$/,'$2').split(',').forEach((color, i) => {
-        if (i === 3) return
+      this.currentRGB.forEach(color => {
         let int = parseInt(color, 10).toString(16)
         text += int.length === 1 ? `0${int}` : int
       })
-    } else {
+    } else if (this.valueType === 2) {
       text = val
+    } else if (this.valueType === 3) {
+      let [r, g, b] = getRGB(val)
+      let [r1, g1, b1] = getRGB(this.alpha.background)
+      let r2, g2, b2, a2 = this.alpha.opacity
+      r2 = (r - r1 * (1 - a2)) / a2
+      g2 = (g - g1 * (1 - a2)) / a2
+      b2 = (b - b1 * (1 - a2)) / a2
+      r2 = r2 > 255 ? 255 : Math.round(r2)
+      g2 = g2 > 255 ? 255 : Math.round(g2)
+      b2 = b2 > 255 ? 255 : Math.round(b2)
+      text = `rgba(${r2},${g2},${b2},${a2})`
     }
     this.currentColor = text
     this.colorValue.innerText = text
+  }
+
+
+  handleMousedown(e) {
+    if (e.button == 2 && this.valueType == 3) {
+      this.alpha.background = `rgba(${this.currentRGB[0]},${this.currentRGB[1]},${this.currentRGB[2]},1)`
+    }
+    if (e.button == 0) {
+      this.handleSend()
+    }
   }
 
   handleSend () {

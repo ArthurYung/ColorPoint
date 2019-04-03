@@ -136,13 +136,19 @@ input[type=range]::-webkit-slider-thumb {
 }
 .range-box {
   position: relative;
+  opacity: 0.2;
 }
+
+.is-alpha {
+  opacity: 1;
+}
+
 .range-box i{
   display: inline-block;
   width: 10px;
   height: 10px;
   border: 1px solid #acacac;
-  margin: 0 8px 0 16px
+  margin: 0 8px 0 16px;
 }
 .range-box input {
   position: absolute;
