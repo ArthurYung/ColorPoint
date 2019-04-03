@@ -5,6 +5,17 @@ const getRGB = (str) => {
   const [r, g, b] = str.replace(/^(rgba\()(.*)(\))$/, '$2').split(',')
   return [r, g, b]
 }
+
+const colorFormat = color => {
+  if (color >= 255) {
+    return '+'
+  }
+  if (color < 0) {
+    return '-'
+  }
+  return Math.round(color)
+}
+
 class App {
   constructor(opt) {
     this.size = {
@@ -54,6 +65,7 @@ class App {
   changeRanger(key, value) {
     if (key === 'opacity') {
       this.input.getElementsByTagName('span')[0].innerText = value
+      this.input.getElementsByTagName('input')[0].value = value * 10
     }
     if (key === 'background') {
       this.input.getElementsByTagName('i')[0].style.background = value
@@ -177,7 +189,7 @@ class App {
     this.view.appendChild(this.background)
     this.video.src = ""
     document.body.appendChild(this.menu)
-    this.alpha.background = '#rgba(255,255,255,1)'
+    this.alpha.background = 'rgba(255,255,255,1)'
     this.alpha.opacity = 0.5
   }
 
@@ -331,12 +343,9 @@ class App {
       let [r, g, b] = getRGB(val)
       let [r1, g1, b1] = getRGB(this.alpha.background)
       let r2, g2, b2, a2 = this.alpha.opacity
-      r2 = (r - r1 * (1 - a2)) / a2
-      g2 = (g - g1 * (1 - a2)) / a2
-      b2 = (b - b1 * (1 - a2)) / a2
-      r2 = r2 > 255 ? 255 : Math.round(r2)
-      g2 = g2 > 255 ? 255 : Math.round(g2)
-      b2 = b2 > 255 ? 255 : Math.round(b2)
+      r2 = colorFormat((r - r1 * (1 - a2)) / a2)
+      g2 = colorFormat((g - g1 * (1 - a2)) / a2)
+      b2 = colorFormat((b - b1 * (1 - a2)) / a2)
       text = `rgba(${r2},${g2},${b2},${a2})`
     }
     this.currentColor = text
