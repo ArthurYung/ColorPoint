@@ -5,13 +5,15 @@ const { createMenu, menuBuild } = require('./menur')
 const { changeShort, pushColor, getColor } = require('./db')
 const { actions, DEFAULTE_KEYS, HISTORY_COLOR } = require('./store')
 
- require('electron-debug')({ showDevTools: false })
-
 const ASSETS_PATH = resolve(__dirname, 'assets')
 const APP_ICON = resolve(ASSETS_PATH,  'image/icon_app.png')
 const WHILTE_ICON = resolve(ASSETS_PATH, 'image/icon_tray.png')
 const MAIN_HTML = resolve(ASSETS_PATH, 'index.html')
 const PICK_HTML = resolve(ASSETS_PATH, 'pick.html')
+
+if (process.env.NODE_ENV === 'dev') {
+  require('electron-debug')({ showDevTools: false })
+}
 
 const isMac = process.platform === 'darwin'
 
