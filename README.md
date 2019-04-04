@@ -25,7 +25,7 @@
 
 ## 下载安装
 
-[Windows](/ArthurYung/ColorPoint/releases/download/1.0.1/Color-Point-win32-x64.zip)
+[Windows](https://github.com/ArthurYung/ColorPoint/releases/download/1.0.1/Color-Point-win32-x64.zip)
 MacOs
 
 
