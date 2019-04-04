@@ -1,6 +1,6 @@
 {
   "name": "color-point",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "private": true,
   "description": "A colour picking app based on Electron",
   "main": "./app/main.js",
