@@ -3,7 +3,7 @@
 > 桌面吸色工具
 
 <p align="center">
-  <img src="/icon.png" alt="" height="220">
+  <img src="/icon.png" alt="" height="200">
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/release/ArthurYung/ColorPoint.svg" alt="">
