@@ -103,9 +103,7 @@ function ipcMessager(main) {
     main.hide()
     pickWindow.setSize(arg.width,  arg.height)
     pickWindow.show()
-    setTimeout(() => {
-      pickWindow.webContents.send('start-point-pr', mainVisble)
-    }, 60);
+    pickWindow.webContents.send('start-point-pr', mainVisble)
   })
   
   // 关闭颜色选择窗口并打开主窗口
