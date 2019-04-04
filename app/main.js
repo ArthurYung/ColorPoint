@@ -95,6 +95,13 @@ function startByShort() {
   mainWindow.webContents.send('shortcut-show');
 }
 
+// windows下使用任务栏气泡通知
+
+function trayMessage(content) {
+  if (isMac || !trayApp) return
+  trayApp.displayBalloon({title: 'Color Point', content})
+}
+
 // 绑定ipc消息
 function ipcMessager(main) {
 
@@ -120,6 +127,7 @@ function ipcMessager(main) {
   // 复制颜色成功显示通知窗
   ipcMain.on('show-notification', function() {
     notification.show()
+    trayMessage('颜色已复制')
   })
 }
 
@@ -182,6 +190,7 @@ async function createWindow () {
     event.preventDefault();
     mainWindow.hide(); 
     !isMac && mainWindow.setSkipTaskbar(true);
+    trayMessage('任务最小化到托盘')
   })
 
   mainWindow.on('closed', function (e) {
