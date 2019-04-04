@@ -4,6 +4,11 @@
 <p align="center">
   <img src="/icon.png" alt="" height="220">
 </p>
+<p align="center">
+    <img src="https://img.shields.io/github/release/ArthurYung/ColorPoint.svg" alt="">
+    <img src="https://img.shields.io/github/downloads/ArthurYung/ColorPoint/total.svg" alt="">
+    <img src="https://img.shields.io/github/release-date/ArthurYung/ColorPoint.svg" alt="">
+</p>
 
 ## 应用说明
 
