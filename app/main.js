@@ -99,7 +99,7 @@ function startByShort() {
 
 function trayMessage(content) {
   if (isMac || !trayApp) return
-  trayApp.displayBalloon({title: 'Color Point', content})
+  trayApp.displayBalloon({icon: APP_ICON, title: 'Color Point', content})
 }
 
 // 绑定ipc消息
