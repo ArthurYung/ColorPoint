@@ -1,6 +1,8 @@
-const { ipcRenderer, desktopCapturer, clipboard } = require( "electron" );
+const { ipcRenderer, clipboard } = require( "electron" );
 const { mutation } = require('./store')
-
+const screenshots = require('desktop-screenshot');
+const { resolve } = require('path')
+const fs = require('fs')
 const getRGB = (str) => {
   if (!str) return [,,,]
   const [r, g, b] = str.replace(/^(rgba\()(.*)(\))$/, '$2').split(',')
@@ -33,6 +35,7 @@ class App {
       value: 3,
       text: '(rgba)透明度'
     }]
+    this.src = resolve(__dirname, 'screenshot.png')
     this.startType = false
     this.imgData = []
     this.clipData = []
@@ -74,8 +77,7 @@ class App {
   }
 
   createCanvas() {
-    this.video = document.createElement('video')
-    this.video.autoplay = 'autoplay'
+    this.image = new Image()
     this.background = document.createElement('canvas')
     this.clipView = document.createElement('div')
     this.colorValue = document.createElement('span')
@@ -156,40 +158,19 @@ class App {
   }
   
   getScreenImage() {
-      desktopCapturer.getSources({
-        types: ['screen'], 
-        thumbnailSize: {width: 1,height: 1}
-      }, (err, sources) => {
-        if (err) {
-          return reject(err) 
-        }
-        navigator.getUserMedia({
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: sources[0].id,
-              minWidth: this.size.width,
-              minHeight: this.size.height,
-              maxWidth: this.size.width,
-              maxHeight: this.size.height,
-            },
-          }
-        },
-        stream => {
-          this.video.setAttribute('src', URL.createObjectURL(stream));
-        },
-        err => {console.log(err)})
-      })
+    screenshots(this.src, (error, complete) => {
+      if(error)
+        console.log("Screenshot failed", error);
+      else
+        this.image.src = this.src +'?' + Math.random()
+    });
   }
 
-  playVideo() {
-    this.video.pause()
-    this.bg.drawImage(this.video, 0, 0, this.size.width, this.size.height)
+  drawBackground() {
+    this.bg.drawImage(this.image, 0, 0, this.size.width, this.size.height)
     this.imgData = this.bg.getImageData(0, 0, this.size.width, this.size.height)
     this.imgGeted = true
     this.view.appendChild(this.background)
-    this.video.src = ""
     document.body.appendChild(this.menu)
     this.alpha.background = 'rgba(255,255,255,1)'
     this.alpha.opacity = 0.5
@@ -202,7 +183,7 @@ class App {
   }
 
   addEventListener() {
-    this.bindEvent('video', 'play', this.playVideo)
+    this.bindEvent('image', 'load', this.drawBackground)
     this.bindEvent('background', 'mouseenter', this.showClip)
     this.bindEvent('menu', 'mouseenter', this.hideClip)
     this.bindEvent('button', 'click', this.menuToggle)
@@ -398,6 +379,7 @@ class App {
     if (this.background.parentNode === this.view) {
       this.view.removeChild(this.background)
     }
+    fs.unlinkSync(this.src)
   }
 }
 const app = new App({
