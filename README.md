@@ -1,6 +1,7 @@
 # Color Point
 
 > 桌面吸色工具
+
 <p align="center">
   <img src="/icon.png" alt="" height="220">
 </p>
