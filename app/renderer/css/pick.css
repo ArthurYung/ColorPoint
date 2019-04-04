@@ -63,11 +63,11 @@ canvas {
   position: absolute;
   width: 16px;
   height: 20px;
-  right: 4px;
-  top: 30px;
+  right: 8px;
+  top: 48px;
   text-align: center;
-  font-size: 16px;
-  color: #6868688c
+  font-size: 22px;
+  color: #868686
 }
 
 .menu-view a:hover {

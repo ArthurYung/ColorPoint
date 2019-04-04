@@ -142,7 +142,7 @@ async function createWindow () {
 
   mainWindow = new BrowserWindow({
     width: 400,
-    height: isMac ? 390 : 410,
+    height: isMac ? 390 : 400,
     resizable: false,
     title: 'Color Point',
     backgroundColor: '#111327',
