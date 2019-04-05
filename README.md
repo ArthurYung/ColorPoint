@@ -29,7 +29,7 @@
 [MacOS](https://github.com/ArthurYung/ColorPoint/releases/download/1.0.6/Color-Point-darwin-x64.zip)
 
 
-## 使用截图
+## 开始使用
 
 ### 可在主界面自定义快捷键 .  
 ![start](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/start.gif)   
