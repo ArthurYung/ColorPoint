@@ -27,7 +27,7 @@ class App {
     }
     this.inputLabel = [{
       value: 1,
-      text: '十六进制'
+      text: 'HEX'
     }, {
       value: 2,
       text: 'RGBA'
@@ -158,11 +158,11 @@ class App {
   }
   
   getScreenImage() {
-    screenshots(this.src, (error, complete) => {
+    screenshots(this.src, error => {
       if(error)
         console.log("Screenshot failed", error);
       else
-        this.image.src = this.src +'?' + Math.random()
+        this.image.src = this.src + '?' + Math.random()
     });
   }
 
@@ -318,7 +318,7 @@ class App {
     if (this.valueType === 1) {
       text = '#'
       this.currentRGB.forEach(color => {
-        let int = parseInt(color, 10).toString(16)
+        let int = parseInt(color, 10).toString(16).toUpperCase()
         text += int.length === 1 ? `0${int}` : int
       })
     } else if (this.valueType === 2) {
@@ -368,8 +368,6 @@ class App {
     this.clipData = []
     this.canvas.width = this.canvas.height = 0
     this.background.width = this.background.height = 0
-    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    // this.bg.clearRect(0, 0, this.background.width, this.background.height)
     if (this.menu.parentNode === document.body) {
       document.body.removeChild(this.menu)
     }
