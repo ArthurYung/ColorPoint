@@ -2,6 +2,7 @@ const { ipcRenderer, clipboard } = require( "electron" );
 const { mutation } = require('./store')
 const screenshots = require('desktop-screenshot');
 const { resolve } = require('path')
+const os = require('os')
 const fs = require('fs')
 const getRGB = (str) => {
   if (!str) return [,,,]
@@ -35,7 +36,7 @@ class App {
       value: 3,
       text: '(rgba)透明度'
     }]
-    this.src = resolve(__dirname, 'screenshot.png')
+    this.src = resolve(os.tmpdir(), 'screenshot.png')
     this.startType = false
     this.imgData = []
     this.clipData = []

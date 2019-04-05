@@ -1,7 +1,8 @@
+const { app } = require('electron')
 const low = require('lowdb')
 const { resolve } = require('path')
 const FileSync = require('lowdb/adapters/FileSync')
-const json = resolve(__dirname, 'db.json')
+const json = resolve(app.getPath('userData'), 'db.json')
 
 const adapter = new FileSync(json)
 const db = low(adapter)
