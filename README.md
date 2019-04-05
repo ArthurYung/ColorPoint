@@ -31,6 +31,19 @@
 
 ## 使用截图
 
+> 可在主界面自定义快捷键
+![start](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/start.gif)   
+
+> 点击开始按钮或使用快捷键开始吸取颜色，吸取颜色后会自动复制到剪切板
+![use](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/use.gif)    
+
+> 系统托盘內也有开始按钮
+![fast](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/fast.gif)   
+
+> 吸取颜色时左下角菜单可切换色值类型
+**当切换透明度模式时，右键可将鼠标所指颜色设置为透明度计算的底色，点击透明度左侧色块可切换底色为纯黑/纯白**
+![alpha](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/alpha.gif)
+
 ## 开发说明
 
 下载项目并安装依赖
