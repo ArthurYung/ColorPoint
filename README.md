@@ -41,7 +41,9 @@
 ![fast](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/fast.gif)   
 
 ### 吸取颜色时左下角菜单可切换色值类型 .  
-当切换透明度模式时，你可以得到一个带有指定透明度的色值。**这个色值叠加到所选背景色之后的颜色和当前屏幕所选颜色相同。**右键可将鼠标所指颜色设置为透明度计算的底色，点击透明度左侧色块可切换底色为纯黑/纯白
+当切换透明度模式时，你可以得到一个带有指定透明度的色值。   
+**这个色值叠加到所选背景色之后的颜色和当前屏幕所选颜色相同。**   
+右键可将鼠标所指颜色设置为透明度计算的底色，点击透明度左侧色块可切换底色为纯黑/纯白。
 ![alpha](https://raw.githubusercontent.com/ArthurYung/ColorPoint/master/gifs/alpha.gif)
 
 ## 开发说明
